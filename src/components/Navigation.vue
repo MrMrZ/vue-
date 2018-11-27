@@ -1,6 +1,6 @@
 <template>
-   <div class="content">
-       <div class="title">录入</div>
+   <div class="content1">
+       <div class="title1">录入</div>
    </div>
 </template>
 
@@ -17,11 +17,12 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="less" scoped>
-.content{
-  width: 20%;
+.content1{
+  width: 100%;
   height: 900px;
   float: left;
-  .title{
+  border: 1px solid #000;
+  .title1{
     width: 100%;
     height: 80px;
     text-align: center;

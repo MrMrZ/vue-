@@ -40,24 +40,35 @@ export default {
     Login() {
       console.log("========点击登录");
       var that = this;
-      var user = {
+      var data = {
         username: that.username,
         password: that.password
       };
-      console.log(user, "===================请求参数");
-      that.axios.post(
+      console.log(data, "===================请求参数");
+      that.axios
+        .post(
           "https://power.anlly.net/fuyan/v1/service/login",
-          that.qs.stringify(user),
-          {
-            headers: {
-    'Access-Control-Allow-Origin': '*',
-    'Content-Type': 'application/json',
-  },
-          }
+           data,
         )
         .then(
           function(res) {
-            console.log(res.data,'=================请求成功');
+            if (res.data.status == "success") {
+              // 将token保存到本地
+              localStorage.setItem("token", res.data.token);
+              console.log(res.data, "=================请求成功",res.headers);
+              
+              console.log(localStorage.getItem("token"), "============token");
+              that.$router.push({
+                name: "Home",
+                params: {
+                  // id: id
+                }
+              });
+            }else{
+              console.log(res.data, "=================请求失败",res.headers);
+
+            }
+
             //控制台打印请求成功时返回的数据
             //bind(this)可以不用
           }.bind(this)
@@ -65,7 +76,7 @@ export default {
         .catch(
           function(err) {
             if (err.response) {
-              console.log(err.response,'=================失败');
+              console.log(err.response, "=================失败");
               //控制台打印错误返回的内容
             }
             //bind(this)可以不用

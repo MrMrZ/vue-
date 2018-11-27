@@ -5,12 +5,12 @@
 
      <div class="_input">
          <div class="left">手机号：</div>
-         <input  class="right" type="text" placeholder="18813960141">
+         <input  class="right" type="text"  v-model="phoneNum">
      </div>
      <div class="_input">
          <div class="left">称呼：</div>
          <div  class="input_name" >
-           <input type="text">
+           <input type="text" v-model="username">
          </div>
          <i class="el-icon-edit edit"></i>
            <el-radio class="sex" v-model="radio" label="1">先生</el-radio>
@@ -28,7 +28,7 @@
 
       <div class="btn">
         <div class="quit">取消</div>
-        <div class="submit">提交</div>
+        <div class="submit" v-on:click="submit">提交</div>
       </div>
    </div>
 </template>
@@ -38,14 +38,70 @@ export default {
   name: "Home",
   data() {
     return {
-      msg: "Welcome to Your Vue.js App",
-        radio: '1',
-        textarea:''
+      radio: "1", //性别
+      textarea: "", //备注
+      phoneNum: "", //手机号
+      username: "" //用户名
     };
   },
   components: {},
 
-  methods: {}
+  methods: {
+    // 提交
+    submit() {
+      console.log('=================hhhh');
+      var that = this;
+
+      var data = {
+        phone: that.phoneNum,
+        realname: that.username,
+        remarks: that.textarea,
+        sex: that.radio
+      };
+      var token = localStorage.getItem('token');
+      console.log(data, "===================请求参数",token,'==========token');
+      that.axios
+        .post(
+          "https://power.anlly.net/fuyan/v1/service/phone",
+          that.qs.stringify(data),
+          {
+            headers: {
+              // "Access-Control-Allow-Origin": "*",
+              // "Content-Type": "application/json; charset=utf-8"
+              'token':token
+            }
+          }
+        )
+        .then(
+          function(res) {
+            console.log(res.data, "=================请求成功");
+            if (res.data.status == "success") {
+                 
+           localStorage.setItem('phone',that.phoneNum);
+            that.$router.push({
+                  name: "Details",
+                  params: {
+                    // info: that.info
+                  }
+                });
+                   
+            }
+
+            //控制台打印请求成功时返回的数据
+            //bind(this)可以不用
+          }.bind(this)
+        )
+        .catch(
+          function(err) {
+            if (err.response) {
+              console.log(err.response, "=================失败");
+              //控制台打印错误返回的内容
+            }
+            //bind(this)可以不用
+          }.bind(this)
+        );
+    }
+  }
 };
 </script>
 
@@ -91,7 +147,7 @@ export default {
       line-height: 60px;
       outline: none;
       border: none;
-
+      border-bottom: 1px solid #000;
     }
     .input_name {
       width: 30%;
@@ -109,16 +165,16 @@ export default {
       }
     }
 
-    .edit{
+    .edit {
       width: 24px;
       height: 24px;
       margin-top: 28px;
-      margin-left: -60px;
+      margin-left: 10px;
     }
-    .sex{
-      margin-left: 40px;
+    .sex {
+      margin-left: 20px;
     }
-    .note{
+    .note {
       width: 80%;
       float: left;
       margin-top: 10px;
@@ -126,19 +182,19 @@ export default {
     }
   }
 
-  .h160{
+  .h160 {
     height: 160px;
   }
 
-  .btn{
+  .btn {
     width: 100%;
     height: 40px;
     clear: both;
     margin-top: 40px;
     cursor: pointer;
-      margin-left: 70px;
+    margin-left: 70px;
 
-    .quit{
+    .quit {
       width: 20%;
       height: 100%;
       line-height: 40px;
@@ -146,15 +202,14 @@ export default {
       float: left;
       border: 1px solid #000;
     }
-    .submit{
+    .submit {
       width: 20%;
       height: 100%;
       line-height: 40px;
       text-align: center;
       float: left;
-      border: 1px solid #000;;
+      border: 1px solid #000;
       margin-left: 60px;
-
     }
   }
 }

@@ -6,30 +6,30 @@
 
      <div class="_input">
          <div class="left">手机号：</div>
-         <div  class="right" >18813960141</div>
+         <div  class="right" >{{info.phone}}</div>
      </div>
      <div class="_input">
-         <div class="left">称呼：</div>
+         <div class="left">称&nbsp;&nbsp;&nbsp;呼：</div>
          <div  class="input_name" >
-           <input type="text">
+           <input type="text" v-model="info.realname" style="text-align:center">
          </div>
          <i class="el-icon-edit edit"></i>
-           <el-radio class="sex" v-model="radio" label="1">先生</el-radio>
-          <el-radio v-model="radio" label="2">女士</el-radio>
+           <el-radio class="sex" v-model="info.sex" label="1">先生</el-radio>
+          <el-radio v-model="info.sex" label="2">女士</el-radio>
      </div>
     <div class="_input h160">
-            <div class="left">备注：</div>
+            <div class="left">备&nbsp;&nbsp;&nbsp;注：</div>
             <el-input class="note"
               type="textarea"
               :rows="6"
               placeholder="请输入内容"
-              v-model="textarea">
+              v-model="info.remarks">
             </el-input>
       </div>
 
       <div class="btn">
         <div class="quit">取消</div>
-        <div class="submit">提交</div>
+        <div class="submit" @click="modify">提交</div>
       </div>
        </div>
 
@@ -39,48 +39,23 @@
                 <div class="title">记录</div>
             <div class="add_record"  @click="centerDialogVisible = true">添加记录</div>
              </div>
-            
-            <div class="history">
-                 <div class="item">
-                   <div class="date">2018年11月20日</div>
-                    <ul class="lists">
+       
+            <div class="history" >
+              <div v-for="item in list" :key="item.id">
+                <div class="item">
+                   <div class="date">{{item.day}}</div>
+                    <ul class="lists" v-for="item1 in item.list" :key="item1.id">
                       <li>
                         <i class="el-icon-phone-outline phone_icon"></i>
-                        <span class="time">19:00</span>
-                        <span class="howlong">20分钟</span>
+                        <span class="time">{{item1.start_time}}</span>
+                        <span class="howlong">{{item1.talk_time}}分钟</span>
                         <span class="line">|</span>
-                        <span class="des">订房</span>
-                      </li>
-                        <li>
-                        <i class="el-icon-phone-outline phone_icon"></i>
-                        <span class="time">19:00</span>
-                        <span class="howlong">20分钟</span>
-                        <span class="line">|</span>
-                        <span class="des">告知订房成功</span>
+                        <span class="des">{{item1.remarks}}</span>
                       </li>
                     </ul>
                  </div>
-
-
-                    <div class="item">
-                   <div class="date">2018年11月20日</div>
-                    <ul class="lists">
-                      <li>
-                        <i class="el-icon-phone-outline phone_icon"></i>
-                        <span class="time">19:00</span>
-                        <span class="howlong">20分钟</span>
-                        <span class="line">|</span>
-                        <span class="des">订房</span>
-                      </li>
-                        <li>
-                        <i class="el-icon-phone-outline phone_icon"></i>
-                        <span class="time">19:00</span>
-                        <span class="howlong">20分钟</span>
-                        <span class="line">|</span>
-                        <span class="des">取消订单</span>
-                      </li>
-                    </ul>
-                 </div>
+              </div>
+                 
             </div>
 
 
@@ -96,11 +71,11 @@
         <div class="input_txt">
           <div class="left">记录类型：</div>
           <div class="right">
-            <select>
-                <option value ="volvo">
+            <select v-model="caty">
+                <option :value ="1">
                   拨入
                 </option>
-                <option value ="saab">拨出</option>
+                <option :value ="2">拨出</option>
               </select>
           </div>
         </div>
@@ -109,8 +84,9 @@
             <div class="left">通话时间：</div>
             <div class="right">
               <el-date-picker class="select_time"
-                v-model="value1"
+                v-model="start_time"
                 type="datetime"
+                value-format="timestamp"
                 placeholder="">
               </el-date-picker>
             </div>
@@ -119,25 +95,24 @@
         <div class="input_txt">
           <div class="left">通话时间：</div>
           <div class="right">
-                <input type="text"> <span class="minute">分钟</span>
+                <input type="text" v-model="talk_time"> <span class="minute">分钟</span>
           </div>
        </div>
 
         <div class="input_txt h200">
             <div class="left">备&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;注：</div>
             <div class="right w300 ">
-                <textarea name="" id="" ></textarea>
+                <textarea name="" id="" v-model="remarks"></textarea>
             </div>
        </div>
 
 
             <span slot="footer" class="dialog-footer">
               <el-button @click="centerDialogVisible = false">取 消</el-button>
-              <el-button type="primary" @click="centerDialogVisible = false">确 定</el-button>
+              <el-button type="primary" @click="addRecord">确 定</el-button>
             </span>
           </el-dialog>
       </div>
-
 
   
 </template>
@@ -145,18 +120,258 @@
 <script>
 export default {
   name: "Home",
+  props: ["msg"],
+
   data() {
     return {
-      msg: "Welcome to Your Vue.js App",
       radio: "1",
       textarea: "",
       centerDialogVisible: false,
-      value1:''
+      value1: "",
+      caty: "", //1,拨入,2,拨出
+      talk_time: "", //通话时长
+      start_time: "", //通话开始时间
+      remarks: "", //备注
+      username: "",
+      id: "", //当前用户id
+      info: {
+        id: "",
+        phone: "",
+        realname: "",
+        remarks: "",
+        sex: "1"
+      },
+      list:[],
     };
   },
   components: {},
 
-  methods: {}
+  methods: {
+
+    timestampToTime(timestamp) {
+        var date = new Date(timestamp * 1000);//时间戳为10位需*1000，时间戳为13位的话不需乘1000
+        var Y = date.getFullYear() + '年';
+        var M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) +'月';
+        var D = date.getDate() + ' ' + '日';
+       
+        return Y+M+D;
+    },
+
+// 搜索手机号
+    search() {
+      var that = this;
+      
+      var data = {
+        phone: that.info.phone
+      };
+      var token = localStorage.getItem("token");
+      console.log(
+        data,
+        "===================请求参数",
+        token,
+        "==========token"
+      );
+      that.axios
+        .get(
+          "https://power.anlly.net/fuyan/v1/service/phone",
+          {
+            params: data,
+            headers: {
+              // "Access-Control-Allow-Origin": "*",
+              // "Content-Type": "application/json; charset=utf-8"
+              token: token
+            }
+          },
+          {
+            xhrFields: { withCredentials: true }
+          }
+        )
+        .then(
+          function(res) {
+            console.log(res.data, "=================请求成功");
+            if (res.data.status == "success") {
+                 that.info = res.data.info;
+            }
+            //控制台打印请求成功时返回的数据
+            //bind(this)可以不用
+          }.bind(this)
+        )
+        .catch(
+          function(err) {
+            if (err.response) {
+              console.log(err.response, "=================失败");
+              //控制台打印错误返回的内容
+            }
+            //bind(this)可以不用
+          }.bind(this)
+        );
+    },
+
+
+    // 修改用户信息
+    modify() {
+      var that = this;
+      var data = that.info;
+      var token = localStorage.getItem("token");
+      console.log(
+        data,
+        "===================请求参数",
+        token,
+        "==========token"
+      );
+      that.axios
+        .put(
+          "https://power.anlly.net/fuyan/v1/service/phone",
+          {
+            params: data,
+            headers: {
+              // "Access-Control-Allow-Origin": "*",
+              // "Content-Type": "application/json; charset=utf-8"
+              token: token
+            }
+          },
+        )
+        .then(
+          function(res) {
+            console.log(res.data, "=================请求成功");
+            if (res.data.status == "success") {
+              that.search();
+              alert('修改成功');
+            }
+
+            //控制台打印请求成功时返回的数据
+            //bind(this)可以不用
+          }.bind(this)
+        )
+        .catch(
+          function(err) {
+            if (err.response) {
+              console.log(err.response, "=================失败");
+              //控制台打印错误返回的内容
+            }
+            //bind(this)可以不用
+          }.bind(this)
+        );
+    },
+    //获取记录
+    getRecord() {
+      var that = this;
+      var data = {
+        phone: that.info.phone
+      };
+      var token = localStorage.getItem("token");
+      console.log(
+        data,
+        "===================请求参数",
+        token,
+        "==========token"
+      );
+      that.axios
+        .get(
+          "https://power.anlly.net/fuyan/v1/service/callrecord",
+         {
+            params: data,
+            headers: {
+              token: token
+            }
+          },
+        )
+        .then(
+          function(res) {
+            console.log(res.data, "=================获取记录成功");
+            if (res.data.status == "success") {
+                 that.list = res.data.lists;
+                 console.log(that.list.length,'=================长度')
+            }
+
+            //控制台打印请求成功时返回的数据
+            //bind(this)可以不用
+          }.bind(this)
+        )
+        .catch(
+          function(err) {
+            if (err.response) {
+              console.log(err.response, "=================失败");
+              //控制台打印错误返回的内容
+            }
+            //bind(this)可以不用
+          }.bind(this)
+        );
+    },
+
+    //添加记录
+    addRecord() {
+      var that = this;
+    
+      var data = {
+        phone:that.info.phone,
+        caty: that.caty,
+        talk_time: that.talk_time,
+        start_time: that.start_time/1000,
+        remarks: that.remarks
+      };
+      var token = localStorage.getItem("token");
+      console.log(
+        data,
+        "===================请求参数",
+        token,
+        "==========token"
+      );
+
+      that.axios
+        .post(
+          "https://power.anlly.net/fuyan/v1/service/callrecord",
+          that.qs.stringify(data),
+          {
+            headers: {
+              // "Access-Control-Allow-Origin": "*",
+              // "Content-Type": "application/json; charset=utf-8"
+              'token':token
+            }
+          }
+        )
+        .then(
+          function(res) {
+            console.log(res.data, "=================添加记录成功");
+            if (res.data.status == "success") {
+                   that.getRecord();
+                  that.centerDialogVisible = false;
+            }
+
+            //控制台打印请求成功时返回的数据
+            //bind(this)可以不用
+          }.bind(this)
+        )
+        .catch(
+          function(err) {
+            if (err.response) {
+              console.log(err.response, "=================失败");
+              //控制台打印错误返回的内容
+            }
+            //bind(this)可以不用
+          }.bind(this)
+        );
+    }
+  },
+  mounted() {
+    var that = this;
+  },
+  created() {
+    var that = this;
+    //获取传入的参数
+    if(that.$route.params.info){
+       that.info = that.$route.params.info;
+       console.log(that.info, "==============参数============");
+    }
+   
+    if(localStorage.getItem('phone')){
+         var phone = localStorage.getItem('phone');
+        that.info.phone = phone;
+         that.search();
+         that.getRecord();
+
+     }
+  }
 };
 </script>
 
@@ -182,6 +397,7 @@ export default {
       font-family: PingFang-SC-Medium;
       font-size: 34px;
       color: rgb(29, 29, 29);
+      text-align: center;
     }
 
     ._input {
@@ -331,7 +547,7 @@ export default {
         .lists {
           list-style: none;
           li {
-            width: 400px;
+            width: 100%;
             margin-top: 10px;
             .phone_icon {
               font-size: 20px;
@@ -343,22 +559,21 @@ export default {
             .time,
             .howlong,
             .des {
+             
               font-family: PingFang-SC-Regular;
               font-size: 20px;
               color: rgb(42, 42, 42);
               margin-left: 10px;
             }
+            
           }
         }
       }
     }
   }
 
-
-  .add_item{
-    height:800px !important;
-    border: 1px solid RED;
-    
+  .add_item {
+    height: 800px !important;
   }
   .input_txt {
     width: 500px;
@@ -379,10 +594,10 @@ export default {
       border: 1px solid #000;
       color: rgb(80, 80, 80);
       font-size: 20px;
-       box-sizing: border-box;
-       padding-left: 10px;
-       
-       padding-right: 10px;
+      box-sizing: border-box;
+      padding-left: 10px;
+
+      padding-right: 10px;
       select {
         width: 100%;
         height: 100%;
@@ -392,22 +607,22 @@ export default {
         border: none;
       }
 
-      .minute{
+      .minute {
         float: right;
       }
 
-      input{
+      input {
         width: 100px;
         height: 90%;
         outline: none;
         border: none;
-         color: rgb(80, 80, 80);
+        color: rgb(80, 80, 80);
         font-size: 20px;
         line-height: 30px;
       }
 
-      textarea{
-        width: 100%;
+      textarea {
+        width: 200px;
         height: 90%;
         resize: none;
         outline: none;
@@ -415,21 +630,20 @@ export default {
         border: none;
       }
 
-      .select_time{
+      .select_time {
         width: 100%;
         height: 100%;
-        border:none;
+        border: none;
       }
     }
 
-    .w300{
-      width: 300px;
+    .w300 {
+      width: 220px;
     }
- 
   }
-    .h200{
-      height: 100px;
-    }
+  .h200 {
+    height: 100px;
+  }
 }
 </style>
 

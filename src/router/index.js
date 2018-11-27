@@ -34,17 +34,19 @@ export default new Router({
     {
       path: '/content',
       name: 'Content',
-      component: Content
+      component: Content,
+      children:[
+        {
+          path: 'adduser',
+          name: 'AddUser',
+          component: AddUser
+        },
+        {
+          path: 'details',
+          name: 'Details',
+          component: Details
+        }
+      ]
     },
-    {
-      path: '/adduser',
-      name: 'AddUser',
-      component: AddUser
-    },
-    {
-      path: '/details',
-      name: 'Details',
-      component: Details
-    }
   ]
 })
