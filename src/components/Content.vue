@@ -2,13 +2,20 @@
    <div class="content"  >
       <div class="nav"><Navigation></Navigation></div>
       <div class="box">
+        <div class="user">
+            <i class="el-icon-caret-bottom logout"></i>
+            <span class="username">客服一号</span>
+             <img src="../assets/mine.png" alt="" class="mine">
+            <div class="quit">注销</div>
+        </div>
           <div class="search">
+              <i class="el-icon-search search_icon" @click="search"></i>
               <input type="text" placeholder="输入完整手机号码" v-model="phoneNum">
-              <img class="search_icon" src="../assets/search@2x.png" alt="" @click="search">
          </div>
+         <div class="line"></div>
              <!-- 创建新用户弹框 -->
             <div class="Tip" v-show="isNew">
-                <div class="title">提示</div>
+                <div class="title" v-show="phoneNum">{{phoneNum}}</div>
                 <div class="msg">这是新用户，是否创建？</div>
                 <div class="btn">
                     <div class="quit" @click="isNew=false">取消</div>
@@ -17,7 +24,6 @@
             </div>
 
             <router-view v-if="isRouterAlive"/>
-
 
       </div>
 
@@ -166,7 +172,7 @@ export default {
       that.$router.push({
         name: "AddUser",
         params: {
-          phoneNum: that.phoneNum
+            phoneNum: that.phoneNum
         }
       });
     },
@@ -183,88 +189,167 @@ export default {
 <style lang="less" scoped>
 .content {
   width: 100%;
-  // height: 900px;
+  height: 1080px;
+  background-color:rgb(30,39,58) ;
   .nav {
     width: 20%;
     float: left;
   }
   .box {
-    width: 78%;
+    width: 80%;
     float: right;
+    .user{
+        width: 100%;
+        height: 102px;
+        background-color: rgb(58,72,104);
+        box-sizing: border-box;
+        padding-right: 70px;
+        position: relative;
+        z-index:22;
+        .username{
+          display: inline-block;
+          float: right;
+          font-family: PingFang-SC-Medium;
+          font-size: 30px;
+          color:#fff;
+          height: 100%;
+          line-height: 102px;
+        }
+        .logout{
+          display: inline;
+          width: 12px;
+          height: 14px;
+          line-height: 102px;
+          float:right;
+          color:rgb(101,144,238);
+          margin-left: 20px;
+        }
+        .active{
+          background-color: rgb(48,59,85);
+        }
+        .mine{
+          float:right;
+          margin-top: 26px;
+          margin-right: 28px;
+        }
+        .quit{
+          width: 141px;
+          height: 60px;
+         background-color: rgb(75,92,132);
+         text-align: center;
+         line-height: 60px;
+         color:#fff;
+         font-family: PingFang-SC-Medium;
+         font-size: 30px;
+         border-radius: 6px;
+         position: absolute;
+         top: 82px;
+         right: 70px;
+        }
+
+    }
     .search {
       width: 100%;
-      height: 80px;
-      background-color: rgb(125, 125, 125);
+      height:148px;
+      background-color: rgb(30,39,58);
       box-sizing: border-box;
-      padding-top: 12px;
+      padding-top: 48px;
       position: relative;
       float: right;
       input {
-        width: 616px;
-        height: 53px;
+        width: 414px;
+        height: 60px;
         border-radius: 26px;
         outline: none;
         font-size: 28px;
         padding-left: 20px;
-        text-align: center;
-        margin-left: 200px;
+        background-color: rgb(23,31,46);
+        border-radius: 6px;
+        font-family: PingFang-SC-Bold;
+        font-size: 36px;
+        color:#FFf;
+        float:right;
+        margin-right: 121px;
+        border: none;
       }
 
       .search_icon {
-        width: 26px;
-        height: 26px;
+        width: 54px;
+        height:54px;
+        color:#fff;
+        float: right;
         position: absolute;
-        right: 200px;
-        top: 26px;
+        top:64px;
+        right: 126px;
+ 
       }
+      .el-icon-search{
+        font-size: 34px;
+      }
+    }
+    .line{
+      width: 1270px;
+      height: 2px;
+      background-color: rgb(72,92,133);
+      margin-top: 148px;
+      margin-left: 121px;
     }
 
     .Tip {
-      width: 500px;
+      width: 743px;
       height: 350px;
-      border: 1px solid #000;
-      margin: 150px auto;
+      margin: 132px auto;
       box-sizing: border-box;
       .title {
         width: 100%;
         height: 80px;
         text-align: center;
         line-height: 80px;
-        font-size: 28px;
-        border-bottom: 1px solid #ccc;
+        font-size:72px;
+        color:rgb(143,113,255);
+        font-family: PingFang-SC-Bold;
       }
       .msg {
         width: 100%;
         height: 160px;
         text-align: center;
         line-height: 160px;
-        font-size: 24px;
+        font-size: 60px;
+        font-family: PingFang-SC-Medium;
+        color:#fff;
+        margin-top: 40px;
       }
 
       .btn {
         width: 100%;
-        height: 60px;
+        height: 80px;
         clear: both;
         box-sizing: border-box;
-        padding-left: 20px;
-        padding-right: 20px;
+        margin-top: 100px;
         div {
           text-align: center;
-          line-height: 60px;
+          line-height: 80px;
           font-size: 24px;
-          border: 1px solid #000;
+          font-family: PingFang-SC-Medium;
+          font-size: 48px;
+          border-radius: 10px;
         }
         .quit {
-          width: 30%;
-          float: left;
+          width:326px;
+          float: right;
+          background-color: rgb(66,81,114);
+          color:#fff;
         }
         .sure {
-          width: 30%;
-          float: right;
+          width:326px;
+          float: left;
+          background-color: rgb(90,58,208);
+          color:#fff;
         }
       }
     }
   }
 }
 </style>
+
 

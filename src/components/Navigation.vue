@@ -19,16 +19,19 @@ export default {
 <style lang="less" scoped>
 .content1{
   width: 100%;
-  height: 900px;
+  height: 1080px;
   float: left;
-  border: 1px solid #000;
+  background-color: rgb(18,23,34);
+  box-sizing: border-box;
+  padding-top: 150px;
   .title1{
     width: 100%;
-    height: 80px;
+    height: 102px;
     text-align: center;
-    line-height: 80px;
-    background-color: rgb(63,63,63);
-    font-size: 34px;
+    line-height: 102px;
+    background-color: rgb(43,126,255);
+    font-size: 40px;
+    font-family: PingFang-SC-Medium;
     color:#fff;
     
   }
