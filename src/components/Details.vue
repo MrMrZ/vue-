@@ -1,5 +1,5 @@
 <template>
-   <div class="content">
+   <div class="content" >
      
      
         <!-- 用户信息 -->
@@ -22,7 +22,7 @@
                          <div class="_input">
                           <div class="left">备&nbsp;&nbsp;&nbsp;注：</div>
                           <div  class="input_name w200" >
-                            <input type="text" :class="{'active':isEdit}" v-model="info.remarks"  :readonly="!isEdit">
+                            <input type="text" :class="{'active':isEdit}" v-model="info.remarks"  :readonly="!isEdit" >
                           </div>
                         </div>
                    </div>
@@ -41,10 +41,10 @@
                   <div class="add_record" @click="isAddRecord=true">新增记录</div>
               </div>
 
-              <div class="record_list">
-                <div  v-for="item in list" :key="item">
+              <div class="record_list" :class="{'pgtb':list.length>0}">
+                <div  v-for="item in list" :key="item.id">
                       <div class="time">{{item.day}}</div>
-                      <div class="lists" v-for="item1 in item.list" :key="item1">
+                      <div class="lists" v-for="item1 in item.list" :key="item1.id">
                               <ul>
                                 <li>
                                    <span class="phone_icon"> <img src="../assets/call_in.png" alt=""></span>
@@ -60,21 +60,35 @@
                       
               </div>
         </div>
+
+        <div class="pages">
+            <el-pagination
+            background
+            small
+            layout="prev, pager, next"
+            :total="50">
+          </el-pagination>
+        </div>
     
 
-     <div class="mask" v-show="isAddRecord">
+     <div class="mask" v-show="isAddRecord" >
         <div class="new_record">
           <div class="title">新增记录</div>
           <div class="time_msg">
             <div class="left">
                  <div class="type">记录类型</div>
-                  <select v-model="caty" class="_select">
-                    <option :value ="1" class="_option">
-                      拨入
-                    </option>
-                    <option :value ="2">拨出</option>
-                 </select>
-                 
+                 <div class="_select">
+                   <el-select v-model="caty" placeholder="请选择" >
+                      <el-option
+                        v-for="item in options"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value">
+                      </el-option>
+                    </el-select>
+                 </div>
+                  
+                                  
             </div>
             <div class="right">
               <div class="time_des">
@@ -91,7 +105,7 @@
                     </el-date-picker>
                 </div>
                 <div class="long">
-                     <input class="minute" placeholder="20" type="text" v-model="talk_time">
+                     <input class="minute"  type="text" v-model="talk_time">
                      分钟
                 </div>
               </div>
@@ -143,7 +157,14 @@ export default {
       },
       list: [],
       isEdit: false,
-      isAddRecord:false
+      isAddRecord:false,
+       options: [{
+          value: '1',
+          label: '拨入'
+        }, {
+          value: '2',
+          label: '拨出'
+        }],
     };
   },
   components: {},
@@ -177,6 +198,7 @@ export default {
       var data = {
         phone: that.info.phone
       };
+
       var token = localStorage.getItem("token");
       console.log(
         data,
@@ -232,8 +254,9 @@ export default {
         "==========token"
       );
       that.axios
-        .put("https://power.anlly.net/fuyan/v1/service/phone", {
-          params: data,
+        .put("https://power.anlly.net/fuyan/v1/service/phone", 
+        data,
+        {
           headers: {
             // "Access-Control-Allow-Origin": "*",
             // "Content-Type": "application/json; charset=utf-8"
@@ -245,6 +268,8 @@ export default {
             console.log(res.data, "=================请求成功");
             if (res.data.status == "success") {
               that.search();
+              that.isEdit = false;
+
               alert("修改成功");
             }
 
@@ -286,8 +311,11 @@ export default {
           function(res) {
             console.log(res.data, "=================获取记录成功");
             if (res.data.status == "success") {
+              if(res.data.lists){
               that.list = res.data.lists;
               console.log(that.list.length, "=================长度");
+              }
+         
             }
 
             //控制台打印请求成功时返回的数据
@@ -357,7 +385,9 @@ export default {
             //bind(this)可以不用
           }.bind(this)
         );
-    }
+    },
+
+    
   },
   mounted() {
     var that = this;
@@ -389,7 +419,8 @@ export default {
   padding-left: 22px;
   //  height:1800px;
   background-color: rgb(30, 39, 58);
-
+  height:auto;
+  padding-bottom: 50px;
   .message {
     width: 1250px;
     height: 293px;
@@ -437,7 +468,7 @@ export default {
           }
           .input_name {
             width: 30%;
-            height: 50px;
+            height: 100%;
             float: left;
             outline: none;
             input {
@@ -455,16 +486,29 @@ export default {
               border-radius: 10px;
               border: 1px solid rgb(75, 92, 132);
               background-color: rgb(35, 46, 69);
+
             }
           }
-          .w200 {
+          .w200{
             width: 70%;
-            font-size: 40px;
-            margin-top: 4px;
-            input {
+            input{
+              padding-top: 9px;
+              padding-bottom: 8px;
               font-size: 30px;
             }
           }
+          // .w200 {
+          //   width: 70%;
+          //   // height: 100%;
+          //   font-size: 40px;
+          //   // line-height: 60px;
+          //   input {
+          //     font-size: 30px;
+          //     //  line-height: 60px;
+          //     //  height: 100%;
+
+          //   }
+          // }
           .edit {
             width: 24px;
             height: 24px;
@@ -555,14 +599,20 @@ export default {
 
     .record_list {
       width: 100%;
+      height: 560px;
       // height:293px ;
       background-color: rgb(43, 55, 81);
       border-radius: 20px;
-      box-sizing: border-box;
       padding-left: 32px;
-      padding-top: 26px;
-      padding-bottom: 36px;
+      overflow: hidden;
+      overflow-y: scroll;
+  
       margin-top: 20px;
+      .pdtb{
+            box-sizing: border-box;
+            padding-top: 26px;
+            padding-bottom: 36px;
+      }
       .time {
         font-family: PingFang-SC-Medium;
         font-size: 36px;
@@ -615,88 +665,6 @@ export default {
     }
   }
 
-  .record {
-    margin-top: 20px;
-    clear: both;
-    height: 800px;
-
-    .top {
-      width: 100%;
-      height: 60px;
-      clear: both;
-      box-sizing: border-box;
-      padding-left: 40px;
-      .title {
-        width: 170px;
-        height: 60px;
-        line-height: 60px;
-        border-bottom: 6px solid rgb(125, 125, 125);
-        border-radius: 2px;
-        font-family: PingFang-SC-Medium;
-        font-size: 34px;
-        color: rgb(29, 29, 29);
-        float: left;
-        text-align: center;
-      }
-      .add_record {
-        float: left;
-        width: 105px;
-        height: 40px;
-        line-height: 40px;
-        border: 1px solid #000;
-        margin-left: 20px;
-        margin-top: 10px;
-        cursor: pointer;
-        font-family: PingFang-SC-Medium;
-        font-size: 20px;
-        color: rgb(29, 29, 29);
-        text-align: center;
-      }
-    }
-    .history {
-      width: 100%;
-      margin-top: 30px;
-      box-sizing: border-box;
-      padding-top: 10px;
-      height: 700px;
-      overflow-y: scroll;
-      .item {
-        .date {
-          width: 180px;
-          height: 34px;
-          text-align: center;
-          line-height: 34px;
-          background-color: rgb(191, 191, 191);
-          font-family: PingFang-SC-Regular;
-          font-size: 20px;
-          color: rgb(42, 42, 42);
-          margin-left: 40px;
-        }
-        .lists {
-          list-style: none;
-          li {
-            width: 100%;
-            margin-top: 10px;
-            .phone_icon {
-              font-size: 20px;
-            }
-            .line {
-              font-size: 24px;
-              margin-left: 10px;
-            }
-            .time,
-            .howlong,
-            .des {
-              font-family: PingFang-SC-Regular;
-              font-size: 20px;
-              color: rgb(42, 42, 42);
-              margin-left: 10px;
-            }
-          }
-        }
-      }
-    }
-  }
   .mask {
     width: 100%;
     height: 1080px;
@@ -709,7 +677,7 @@ export default {
       width: 916px;
       height: 540px;
       background-color: rgb(52, 69, 104);
-      margin: 311px auto;
+      margin: 180px auto;
       border-radius: 20px;
       box-sizing: border-box;
       padding-left: 40px;
@@ -736,7 +704,7 @@ export default {
           }
           ._select {
             width: 175px;
-            height: 75px;
+            height: 73px;
             border-radius: 10px;
             outline: none;
             font-size: 29px;
@@ -745,15 +713,16 @@ export default {
             text-align: center;
             margin-top: 19px;
             border: none;
-            appearance: none;
-            -moz-appearance: none;
-            -webkit-appearance: none;
-            background: url("../assets/tri.png") no-repeat scroll right center
-              transparent;
+            // appearance: none;
+            // -moz-appearance: none;
+            // -webkit-appearance: none;
+            // background: url("../assets/tri.png") no-repeat scroll right center
+            //   transparent;
             background-color: rgb(75, 92, 132);
             box-sizing: border-box;
             padding-left: 10px;
             padding-right: 10px;
+            padding-top: 10px;
 
             ._option {
               width: 175px;
@@ -800,11 +769,14 @@ export default {
             box-sizing: border-box;
             padding-left: 24px;
             padding-right: 24px;
-            margin-top: 20px;
+            margin-top: 14px;
 
             .date {
               float: left;
+              position: relative;
               .select_time {
+                position: absolute;
+                top: 0px;
                 .el-input__inner {
                   background: none;
                 }
@@ -881,78 +853,17 @@ export default {
       }
     }
   }
-  .add_item {
-    height: 800px !important;
+
+  .pages{
+    width: 100%;
+    height: 50px;
+    margin-top: 50px;
+    text-align: center;
+    line-height: 50px;
   }
-  .input_txt {
-    width: 500px;
-    height: 40px;
-    clear: both;
-    margin-top: 10px;
-    .left {
-      float: left;
-      font-family: PingFang-SC-Medium;
-      font-size: 20px;
-      color: rgb(80, 80, 80);
-    }
-    .right {
-      width: 220px;
-      height: 100%;
-      float: left;
-      margin-left: 20px;
-      border: 1px solid #000;
-      color: rgb(80, 80, 80);
-      font-size: 20px;
-      box-sizing: border-box;
-      padding-left: 10px;
 
-      padding-right: 10px;
-      select {
-        width: 100%;
-        height: 100%;
-        text-align: center;
-        line-height: 30px;
-        font-size: 20px;
-        border: none;
-      }
 
-      .minute {
-        float: right;
-      }
-
-      input {
-        width: 100px;
-        height: 90%;
-        outline: none;
-        border: none;
-        color: rgb(80, 80, 80);
-        font-size: 20px;
-        line-height: 30px;
-      }
-
-      textarea {
-        width: 200px;
-        height: 90%;
-        resize: none;
-        outline: none;
-        font-size: 20px;
-        border: none;
-      }
-
-      .select_time {
-        width: 100%;
-        height: 100%;
-        border: none;
-      }
-    }
-
-    .w300 {
-      width: 220px;
-    }
-  }
-  .h200 {
-    height: 100px;
-  }
 }
+
 </style>
 

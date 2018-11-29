@@ -127,6 +127,7 @@ export default {
   background-color: rgb(30, 39, 58);
   margin-left: 496px;
   margin-top: 100px;
+  background-color: pink;
   .title {
     width: 100%;
     height: 60px;

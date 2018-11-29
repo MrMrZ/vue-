@@ -21,7 +21,7 @@
                   </div>
                   <div class="right">
                     <input type="password" v-model="password">
-                    <div class="tip">提示：输入密码有误</div>
+                    <div class="tip" v-show="loginError">提示：{{tip}}</div>
                   </div>
                 </div>
               <!-- <router-link class="_router" to="/">  <div class="submit" @click="Login">登录</div> </router-link> -->
@@ -36,12 +36,13 @@ export default {
   data() {
     return {
       username: "",
-      password: ""
+      password: "",
+      loginError: false,
+      tip:'',
     };
   },
   methods: {
     Login() {
-      console.log("========点击登录");
       var that = this;
       var data = {
         username: that.username,
@@ -55,19 +56,20 @@ export default {
             if (res.data.status == "success") {
               // 将token保存到本地
               localStorage.setItem("token", res.data.token);
-              console.log(res.data, "=================请求成功", res.headers);
+              console.log(res.data, "=================登录成功", res.headers);
 
               console.log(localStorage.getItem("token"), "============token");
               that.$router.push({
                 name: "Content",
                 params: {
-                  // id: id
+                  name: that.username
                 }
               });
             } else {
+              that.tip = res.data.msg
+              that.loginError = true;
               console.log(res.data, "=================请求失败", res.headers);
             }
-
             //控制台打印请求成功时返回的数据
             //bind(this)可以不用
           }.bind(this)
@@ -75,7 +77,8 @@ export default {
         .catch(
           function(err) {
             if (err.response) {
-              console.log(err.response, "=================失败");
+              that.loginError = true;
+              console.log(err.response, "=================登录失败");
               //控制台打印错误返回的内容
             }
             //bind(this)可以不用
@@ -156,15 +159,15 @@ export default {
             border: 1px solid rgb(83, 103, 149);
             outline: none;
             border-radius: 10px;
-            color:#fff;
+            color: #fff;
             font-family: PingFang-SC-Regular;
             font-size: 34px;
             box-sizing: border-box;
             padding-left: 17px;
           }
-          .tip{
+          .tip {
             font-family: PingFang-SC-Regular;
-            color:rgb(252,79,79);
+            color: rgb(252, 79, 79);
             font-size: 20px;
             margin-top: 16px;
           }

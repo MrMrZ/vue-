@@ -3,25 +3,26 @@
       <div class="nav"><Navigation></Navigation></div>
       <div class="box">
         <div class="user">
-            <i class="el-icon-caret-bottom logout"></i>
-            <span class="username">客服一号</span>
-             <img src="../assets/mine.png" alt="" class="mine">
-            <div class="quit">注销</div>
+            <i class="el-icon-caret-bottom logout" v-show="!isLogout" @click="isLogout=true"></i>
+            <i class="el-icon-caret-top logout" v-show="isLogout"  @click="isLogout=false"></i>
+            <span class="username">{{name}}</span>
+             <img src="../assets/mine.png" alt="" class="mine" >
+            <div class="quit" v-show="isLogout" @click="logout">注销</div>
         </div>
           <div class="search">
               <i class="el-icon-search search_icon" @click="search"></i>
-              <input type="text" placeholder="输入完整手机号码" v-model="phoneNum">
+              <input type="text" placeholder="输入完整手机号码" v-model="phoneNum" @input="toSearch"  @keyup.enter="search">
          </div>
          <div class="line"></div>
              <!-- 创建新用户弹框 -->
-            <div class="Tip" v-show="isNew">
+            <!-- <div class="Tip" v-show="isNew">
                 <div class="title" v-show="phoneNum">{{phoneNum}}</div>
                 <div class="msg">这是新用户，是否创建？</div>
                 <div class="btn">
                     <div class="quit" @click="isNew=false">取消</div>
                     <div class="sure" @click="toAdd">创建新用户</div>
                 </div>
-            </div>
+            </div> -->
 
             <router-view v-if="isRouterAlive"/>
 
@@ -38,6 +39,8 @@
 import AddUser from "./AddUser";
 import Details from "./Details";
 import Navigation from "./Navigation";
+import NewUser from "./NewUser";
+
 export default {
   name: "Home",
   data() {
@@ -47,46 +50,24 @@ export default {
       to_add: false, //去创建
       showDes: false, //显示详情用户信息
       info: {},
-      isRouterAlive:true,
+      isRouterAlive: true,
+      isLogout: false,
+      name: "" //当前登录客服
     };
   },
   components: {
     AddUser,
     Details,
-    Navigation
+    Navigation,
+    NewUser
   },
 
   methods: {
-    open4() {
-      const h = this.$createElement;
-      this.$msgbox({
-        title: "提示",
-        message: h("p", null, [h("span", null, "这是新用户，是否创建？")]),
-        showCancelButton: true,
-        confirmButtonText: "创建新用户",
-        cancelButtonText: "取消",
-        beforeClose: (action, instance, done) => {
-          if (action === "confirm") {
-            instance.confirmButtonLoading = true;
-            instance.confirmButtonText = "执行中...";
-            setTimeout(() => {
-              done();
-              setTimeout(() => {
-                instance.confirmButtonLoading = false;
-              }, 300);
-            }, 3000);
-          } else {
-            done();
-          }
-        }
-      }).then(action => {
-        this.$message({
-          type: "info",
-          message: "action: " + action
-        });
-      });
+    toSearch() {
+      if (this.phoneNum.length == 11) {
+        this.search();
+      }
     },
-
     // 搜索手机号
     search() {
       var that = this;
@@ -124,20 +105,42 @@ export default {
             console.log(res.data, "=================请求成功");
             if (res.data.status == "success") {
               if (res.data.info == null) {
-                that.isNew = true;
-              } else {
+                //  that.isNew = true;\
 
+                if (that.$route.path === "/content/newuser") {
+                  //表示在当前用户信息页，不用跳转,刷新当前组件
+
+                  that.$router.push({
+                    name: "Content",
+                    params: {}
+                  });
+
+                  setTimeout(() => {
+                    that.$router.push({
+                      name: "NewUser",
+                      params: {
+                        phoneNum: that.phoneNum
+                      }
+                    });
+                  }, 100);
+                } else {
+                  that.$router.push({
+                    name: "NewUser",
+                    params: {
+                      phoneNum: that.phoneNum
+                    }
+                  });
+                }
+              } else {
                 console.log(that.$route.path, "==============当前路由");
 
                 that.info = res.data.info;
                 localStorage.setItem("phone", that.info.phone);
 
                 if (that.$route.path === "/content/details") {
-                
                   //表示在当前用户信息页，不用跳转,刷新当前组件
-                  that.isRouterAlive = false; 
-                   that.$nextTick(() => (that.isRouterAlive = true))
-                  
+                  that.isRouterAlive = false;
+                  that.$nextTick(() => (that.isRouterAlive = true));
                 } else {
                   that.$router.push({
                     name: "Details",
@@ -172,7 +175,7 @@ export default {
       that.$router.push({
         name: "AddUser",
         params: {
-            phoneNum: that.phoneNum
+          phoneNum: that.phoneNum
         }
       });
     },
@@ -180,6 +183,24 @@ export default {
     //显示用户信息
     showInfo(data) {
       console.log(data, "===============子组件参数");
+    },
+
+    // 注销
+    logout() {
+      var that = this;
+      localStorage.clear();
+      that.$router.push({
+        name: "Login",
+        params: {}
+      });
+    }
+  },
+  created() {
+    var that = this;
+    //获取传入的参数
+    if (that.$route.params.name) {
+      that.name = that.$route.params.name;
+      console.log(that.name, "==============参数============");
     }
   }
 };
@@ -190,7 +211,7 @@ export default {
 .content {
   width: 100%;
   height: 1080px;
-  background-color:rgb(30,39,58) ;
+  background-color: rgb(30, 39, 58);
   .nav {
     width: 20%;
     float: left;
@@ -198,60 +219,60 @@ export default {
   .box {
     width: 80%;
     float: right;
-    .user{
-        width: 100%;
-        height: 102px;
-        background-color: rgb(58,72,104);
-        box-sizing: border-box;
-        padding-right: 70px;
-        position: relative;
-        z-index:22;
-        .username{
-          display: inline-block;
-          float: right;
-          font-family: PingFang-SC-Medium;
-          font-size: 30px;
-          color:#fff;
-          height: 100%;
-          line-height: 102px;
-        }
-        .logout{
-          display: inline;
-          width: 12px;
-          height: 14px;
-          line-height: 102px;
-          float:right;
-          color:rgb(101,144,238);
-          margin-left: 20px;
-        }
-        .active{
-          background-color: rgb(48,59,85);
-        }
-        .mine{
-          float:right;
-          margin-top: 26px;
-          margin-right: 28px;
-        }
-        .quit{
-          width: 141px;
-          height: 60px;
-         background-color: rgb(75,92,132);
-         text-align: center;
-         line-height: 60px;
-         color:#fff;
-         font-family: PingFang-SC-Medium;
-         font-size: 30px;
-         border-radius: 6px;
-         position: absolute;
-         top: 82px;
-         right: 70px;
-        }
-
+    .user {
+      width: 100%;
+      height: 102px;
+      background-color: rgb(58, 72, 104);
+      box-sizing: border-box;
+      padding-right: 70px;
+      position: relative;
+      z-index: 22;
+      .username {
+        display: inline-block;
+        float: right;
+        font-family: PingFang-SC-Medium;
+        font-size: 30px;
+        color: #fff;
+        height: 100%;
+        line-height: 102px;
+      }
+      .logout {
+        display: inline;
+        width: 12px;
+        height: 14px;
+        line-height: 102px;
+        float: right;
+        color: rgb(101, 144, 238);
+        margin-left: 20px;
+        font-size: 30px;
+      }
+      .active {
+        background-color: rgb(48, 59, 85);
+      }
+      .mine {
+        float: right;
+        margin-top: 26px;
+        margin-right: 28px;
+      }
+      .quit {
+        width: 141px;
+        height: 60px;
+        background-color: rgb(75, 92, 132);
+        text-align: center;
+        line-height: 60px;
+        color: #fff;
+        font-family: PingFang-SC-Medium;
+        font-size: 30px;
+        border-radius: 6px;
+        position: absolute;
+        top: 82px;
+        right: 70px;
+      }
     }
     .search {
       width: 100%;
-      height:148px;
-      background-color: rgb(30,39,58);
+      height: 148px;
+      background-color: rgb(30, 39, 58);
       box-sizing: border-box;
       padding-top: 48px;
       position: relative;
@@ -263,34 +284,33 @@ export default {
         outline: none;
         font-size: 28px;
         padding-left: 20px;
-        background-color: rgb(23,31,46);
+        background-color: rgb(23, 31, 46);
         border-radius: 6px;
         font-family: PingFang-SC-Bold;
         font-size: 36px;
-        color:#FFf;
-        float:right;
+        color: #fff;
+        float: right;
         margin-right: 121px;
         border: none;
       }
 
       .search_icon {
         width: 54px;
-        height:54px;
-        color:#fff;
+        height: 54px;
+        color: #fff;
         float: right;
         position: absolute;
-        top:64px;
+        top: 64px;
         right: 126px;
- 
       }
-      .el-icon-search{
+      .el-icon-search {
         font-size: 34px;
       }
     }
-    .line{
+    .line {
       width: 1270px;
       height: 2px;
-      background-color: rgb(72,92,133);
+      background-color: rgb(72, 92, 133);
       margin-top: 148px;
       margin-left: 121px;
     }
@@ -305,8 +325,8 @@ export default {
         height: 80px;
         text-align: center;
         line-height: 80px;
-        font-size:72px;
-        color:rgb(143,113,255);
+        font-size: 72px;
+        color: rgb(143, 113, 255);
         font-family: PingFang-SC-Bold;
       }
       .msg {
@@ -316,7 +336,7 @@ export default {
         line-height: 160px;
         font-size: 60px;
         font-family: PingFang-SC-Medium;
-        color:#fff;
+        color: #fff;
         margin-top: 40px;
       }
 
@@ -335,16 +355,16 @@ export default {
           border-radius: 10px;
         }
         .quit {
-          width:326px;
+          width: 326px;
           float: right;
-          background-color: rgb(66,81,114);
-          color:#fff;
+          background-color: rgb(66, 81, 114);
+          color: #fff;
         }
         .sure {
-          width:326px;
+          width: 326px;
           float: left;
-          background-color: rgb(90,58,208);
-          color:#fff;
+          background-color: rgb(90, 58, 208);
+          color: #fff;
         }
       }
     }

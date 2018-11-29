@@ -6,10 +6,7 @@ import Login from '@/components/Login'
 import Content from '@/components/Content'
 import AddUser from '@/components/AddUser'
 import Details from '@/components/Details'
-
-
-
-
+import NewUser from '@/components/NewUser'
 
 
 Vue.use(Router)
@@ -45,6 +42,11 @@ export default new Router({
           path: 'details',
           name: 'Details',
           component: Details
+        },
+         {
+          path: 'newuser',
+          name: 'NewUser',
+          component: NewUser
         }
       ]
     },
