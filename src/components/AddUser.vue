@@ -13,8 +13,10 @@
            <input type="text" v-model="username">
          </div>
          <!-- <i class="el-icon-edit edit"></i> -->
-           <el-radio class="sex" v-model="radio" label="1" size="medium" >先生</el-radio>
-          <el-radio class="sex" v-model="radio" label="2"  size="medium">女士</el-radio>
+         <div class="sex">
+             <el-radio  v-model="radio" label="1" size="medium" >先生</el-radio>
+             <el-radio v-model="radio" label="2"  size="medium">女士</el-radio>
+         </div>
      </div>
     <div class="_input h160">
             <div class="left">备&nbsp;&nbsp;&nbsp;&nbsp;注</div>
@@ -28,7 +30,7 @@
       </div>
 
       <div class="btn">
-        <div class="quit">取消</div>
+        <div class="quit" v-on:click="cancel">取消</div>
         <div class="submit" v-on:click="submit">提交</div>
       </div>
    </div>
@@ -48,10 +50,25 @@ export default {
   components: {},
 
   methods: {
+
+    cancel(){
+      var that = this;
+        that.$router.push({
+          name: "Content",
+          params: {
+            // phoneNum: that.phoneNum
+          }
+        });
+    },
     // 提交
     submit() {
       console.log("=================hhhh");
       var that = this;
+
+      if (!that.username) {
+        alert("请输入称呼");
+        return;
+      }
 
       var data = {
         phone: that.phoneNum,
@@ -60,6 +77,15 @@ export default {
         sex: that.radio
       };
       var token = localStorage.getItem("token");
+
+      if (!token) {
+        that.$router.push({
+          name: "Login",
+          params: {}
+        });
+        return;
+      }
+
       console.log(
         data,
         "===================请求参数",
@@ -127,7 +153,6 @@ export default {
   background-color: rgb(30, 39, 58);
   margin-left: 496px;
   margin-top: 100px;
-  background-color: pink;
   .title {
     width: 100%;
     height: 60px;
@@ -139,7 +164,6 @@ export default {
   }
 
   ._input {
-
     width: 100%;
     height: 80px;
     clear: both;
@@ -175,7 +199,7 @@ export default {
       outline: none;
       input {
         width: 100%;
-        height:100%;
+        height: 100%;
         outline: none;
         font-size: 24px;
         background-color: rgb(35, 46, 69);
@@ -187,8 +211,7 @@ export default {
         margin-left: 28px;
         box-sizing: border-box;
         padding-left: 30px;
-            color: #ffffff;
-        
+        color: #ffffff;
       }
     }
 
@@ -199,17 +222,22 @@ export default {
       margin-left: 10px;
     }
     .sex {
-      margin-left: 60px;
+      margin-left: 400px;
       line-height: 80px;
       font-size: 30px;
+      /deep/ .el-radio__label {
+        font-size: 30px;
+      }
+      /deep/ .el-radio__inner {
+        width: 24px;
+        height: 24px;
+      }
+      /deep/ .el-radio__inner::after{
+        width: 10px;
+        height: 10px;
+      }
     }
-    .el-radio__inner{
-      width: 24px !important;
-      height: 24px !important;
-    }
-    .el-radio__label{
-      font-size:30px !important ;
-    }
+
     .note {
       width: 483px;
       height: 80px;
@@ -219,34 +247,31 @@ export default {
     }
   }
 
- 
-
   .btn {
     width: 100%;
     height: 80px;
     clear: both;
     margin-top: 65px;
     cursor: pointer;
-    div{
-       width:326px;
+    div {
+      width: 326px;
       height: 100%;
       border-radius: 10px;
       text-align: center;
       line-height: 80px;
       font-family: PingFang-SC-Medium;
       font-size: 48px;
-      color:#fff;
+      color: #fff;
     }
 
     .quit {
-        background-color: rgb(46,58,84);
-    
+      background-color: rgb(46, 58, 84);
+
       float: right;
     }
     .submit {
       float: left;
-      background-color: rgb(77,50,177);
-
+      background-color: rgb(77, 50, 177);
     }
   }
 }

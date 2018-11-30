@@ -19,7 +19,8 @@ export default {
   components:{
     Navigation,
     Content
-  }
+  },
+
 }
 </script>
 

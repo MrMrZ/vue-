@@ -1,9 +1,7 @@
 <template>
    <div class="content" >
      
-     
         <!-- 用户信息 -->
-
         <div class="message">
               <div class="phone">{{info.phone}}</div>
               <div class="details">
@@ -14,7 +12,7 @@
                             <input type="text" v-model="info.realname" :class="{'active':isEdit}" :readonly="!isEdit" >
                           </div>
                           <div class="sex_con">
-                              <el-radio class="sex" v-model="info.sex" label="1" :disabled="!isEdit">先生</el-radio>
+                              <el-radio class="sex" v-model="info.sex" label="1" :disabled="!isEdit" style="font-size:40px">先生</el-radio>
                               <el-radio class="sex" v-model="info.sex" label="2" :disabled="!isEdit">女士</el-radio>
                           </div>
                         </div>
@@ -41,13 +39,14 @@
                   <div class="add_record" @click="isAddRecord=true">新增记录</div>
               </div>
 
-              <div class="record_list" :class="{'pgtb':list.length>0}">
+              <div class="record_list" :class="{'pgtb':list.length>0}" v-show="list.length>0">
                 <div  v-for="item in list" :key="item.id">
                       <div class="time">{{item.day}}</div>
                       <div class="lists" v-for="item1 in item.list" :key="item1.id">
                               <ul>
                                 <li>
-                                   <span class="phone_icon"> <img src="../assets/call_in.png" alt=""></span>
+                                   <span class="phone_icon" v-if="item1.caty == 1"> <img src="../assets/call_in.png" alt=""></span>
+                                   <span class="phone_icon" v-else> <img src="../assets/call_out.png" alt=""></span>
                                     <span class="start_time">{{item1.start_time}}</span>
                                     <span class="line">|</span>
                                     <span class="howlong">{{item1.talk_time}}分钟</span>
@@ -62,12 +61,12 @@
         </div>
 
         <div class="pages">
-            <el-pagination
+            <!-- <el-pagination
             background
             small
             layout="prev, pager, next"
             :total="50">
-          </el-pagination>
+          </el-pagination> -->
         </div>
     
 
@@ -101,7 +100,9 @@
                       v-model="start_time"
                       type="datetime"
                       value-format="timestamp"
-                      placeholder="">
+                      placeholder=""
+                      default-time	
+                      default-value	>
                     </el-date-picker>
                 </div>
                 <div class="long">
@@ -112,10 +113,14 @@
             </div>
           </div>
 
-            <div class="add_txt">
-              <input type="text" v-model="remarks" >
+
+           <div class="remark_con">
+             <div class="add_remark">备注</div>
+              <div class="add_txt">
+                <input type="text" v-model="remarks" >
             </div>
 
+           </div>
             <div class="button_con">
                  <div class="sure" @click="addRecord" >提交</div>
                  <div class="no"  @click="isAddRecord=false">取消</div>
@@ -157,14 +162,17 @@ export default {
       },
       list: [],
       isEdit: false,
-      isAddRecord:false,
-       options: [{
-          value: '1',
-          label: '拨入'
-        }, {
-          value: '2',
-          label: '拨出'
-        }],
+      isAddRecord: false,
+      options: [
+        {
+          value: "1",
+          label: "拨入"
+        },
+        {
+          value: "2",
+          label: "拨出"
+        }
+      ]
     };
   },
   components: {},
@@ -200,6 +208,14 @@ export default {
       };
 
       var token = localStorage.getItem("token");
+      if (!token) {
+        that.$router.push({
+          name: "Login",
+          params: {}
+        });
+        return;
+      }
+
       console.log(
         data,
         "===================请求参数",
@@ -247,6 +263,13 @@ export default {
       var that = this;
       var data = that.info;
       var token = localStorage.getItem("token");
+      if (!token) {
+        that.$router.push({
+          name: "Login",
+          params: {}
+        });
+        return;
+      }
       console.log(
         data,
         "===================请求参数",
@@ -254,9 +277,7 @@ export default {
         "==========token"
       );
       that.axios
-        .put("https://power.anlly.net/fuyan/v1/service/phone", 
-        data,
-        {
+        .put("https://power.anlly.net/fuyan/v1/service/phone", data, {
           headers: {
             // "Access-Control-Allow-Origin": "*",
             // "Content-Type": "application/json; charset=utf-8"
@@ -294,6 +315,13 @@ export default {
         phone: that.info.phone
       };
       var token = localStorage.getItem("token");
+      if (!token) {
+        that.$router.push({
+          name: "Login",
+          params: {}
+        });
+        return;
+      }
       console.log(
         data,
         "===================请求参数",
@@ -311,11 +339,10 @@ export default {
           function(res) {
             console.log(res.data, "=================获取记录成功");
             if (res.data.status == "success") {
-              if(res.data.lists){
-              that.list = res.data.lists;
-              console.log(that.list.length, "=================长度");
+              if (res.data.lists) {
+                that.list = res.data.lists;
+                console.log(that.list.length, "=================长度");
               }
-         
             }
 
             //控制台打印请求成功时返回的数据
@@ -337,6 +364,19 @@ export default {
     addRecord() {
       var that = this;
 
+      if (!that.caty) {
+        alert("请选择记录类型");
+        return;
+      }
+      if (!that.start_time) {
+        alert("请选择通话时间");
+        return;
+      }
+      if (!that.talk_time) {
+        alert("请选择通话时长");
+        return;
+      }
+
       var data = {
         phone: that.info.phone,
         caty: that.caty,
@@ -345,6 +385,14 @@ export default {
         remarks: that.remarks
       };
       var token = localStorage.getItem("token");
+
+      if (!token) {
+        that.$router.push({
+          name: "Login",
+          params: {}
+        });
+        return;
+      }
       console.log(
         data,
         "===================请求参数",
@@ -368,6 +416,11 @@ export default {
           function(res) {
             console.log(res.data, "=================添加记录成功");
             if (res.data.status == "success") {
+
+              that.caty = '';
+              that.talk_time = '';
+              that.start_time = '';
+              that.remarks = '';
               that.getRecord();
               that.isAddRecord = false;
             }
@@ -385,9 +438,7 @@ export default {
             //bind(this)可以不用
           }.bind(this)
         );
-    },
-
-    
+    }
   },
   mounted() {
     var that = this;
@@ -411,16 +462,15 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style lang="less" scoped>
+<style lang="less" >
 .content {
   width: 100%;
   float: left;
   box-sizing: border-box;
-  padding-left: 22px;
-  //  height:1800px;
+  // padding-left: 22px;
   background-color: rgb(30, 39, 58);
-  height:auto;
-  padding-bottom: 50px;
+  height: auto;
+  // padding-bottom: 50px;
   .message {
     width: 1250px;
     height: 293px;
@@ -440,6 +490,7 @@ export default {
       box-sizing: border-box;
       padding-left: 48px;
       padding-top: 30px;
+      margin: 20px;
       .msg_con {
         width: 70%;
         height: 100%;
@@ -486,12 +537,11 @@ export default {
               border-radius: 10px;
               border: 1px solid rgb(75, 92, 132);
               background-color: rgb(35, 46, 69);
-
             }
           }
-          .w200{
+          .w200 {
             width: 70%;
-            input{
+            input {
               padding-top: 9px;
               padding-bottom: 8px;
               font-size: 30px;
@@ -524,6 +574,20 @@ export default {
             .sex {
               margin-left: 20px;
               font-size: 30px !important;
+            }
+            .el-radio__label {
+              font-size: 30px;
+            }
+            .el-radio__inner {
+              width: 24px;
+              height: 24px;
+            }
+            .el-radio__inner::after {
+              width: 10px;
+              height: 10px;
+            }
+            .el-radio__input.is-disabled.is-checked .el-radio__inner::after{
+                background-color: #409EFF;
             }
           }
 
@@ -591,7 +655,7 @@ export default {
         line-height: 65px;
         font-family: PingFang-SC-Medium;
         font-size: 36px;
-        color: rgba(255, 255, 255, 0.5);
+        color: rgb(255, 255, 255);
         margin-left: 50px;
         margin-top: 12px;
       }
@@ -606,17 +670,18 @@ export default {
       padding-left: 32px;
       overflow: hidden;
       overflow-y: scroll;
-  
+
       margin-top: 20px;
-      .pdtb{
-            box-sizing: border-box;
-            padding-top: 26px;
-            padding-bottom: 36px;
+      .pdtb {
+        box-sizing: border-box;
+        padding-top: 26px;
+        padding-bottom: 36px;
       }
       .time {
         font-family: PingFang-SC-Medium;
         font-size: 36px;
         color: #fff;
+        margin-top: 20px;
       }
 
       .lists {
@@ -659,9 +724,17 @@ export default {
                 width: 46px;
               }
             }
+            .start_time {
+              /deep/.el-input--suffix .el-input__inner {
+                color: #fff;
+              }
+            }
           }
         }
       }
+    }
+    .record_list::-webkit-scrollbar {
+      display: none;
     }
   }
 
@@ -781,6 +854,10 @@ export default {
                   background: none;
                 }
               }
+              /deep/.el-input__inner{
+                   color:#fff;
+                   font-size: 16px;
+              }
             }
             .long {
               float: right;
@@ -802,68 +879,80 @@ export default {
           }
         }
       }
-      .add_txt {
-        width: 100%;
-        height: 86px;
-        border: 1px solid rgb(117, 136, 177);
-        background-color: rgb(35, 46, 69);
-        border-radius: 10px;
-        font-family: PingFang-SC-Medium;
-        font-size: 30px;
-        color: #fff;
-        margin-top: 68px;
-        input {
-          width: 100%;
-          height: 100%;
-          background: none;
-          outline: none;
+      .remark_con {
+        overflow: hidden;
+          margin-top: 68px;
+        
+        .add_remark{
+          width: 10%;
+          height: 86px;
+          float: left;
+          text-align: left;
+          line-height: 86px;
+          color:#fff;
+          font-size: 30px;
+        }
+        .add_txt {
+          width: 88%;
+          height: 86px;
+          border: 1px solid rgb(117, 136, 177);
+          background-color: rgb(35, 46, 69);
+          border-radius: 10px;
           font-family: PingFang-SC-Medium;
           font-size: 30px;
           color: #fff;
-          border: none;
-          box-sizing: border-box;
-          padding-left: 18px;
+          float: left;
+          input {
+            width: 100%;
+            height: 100%;
+            background: none;
+            outline: none;
+            font-family: PingFang-SC-Medium;
+            font-size: 30px;
+            color: #fff;
+            border: none;
+            box-sizing: border-box;
+            padding-left: 18px;
+          }
         }
       }
-      .button_con{
+
+      .button_con {
         width: 100%;
         height: 50px;
         overflow: hidden;
         margin-top: 50px;
         box-sizing: border-box;
         padding-left: 201px;
-        div{
-            width: 205px;
-            height: 50px;
-            text-align: center;
-            line-height: 50px;
-            font-family: PingFang-SC-Medium;
-            font-size: 30px;
-            float: left;
-            color:rgba(255,255,255,0.5);
-            border-radius:10px;
+        div {
+          width: 205px;
+          height: 50px;
+          text-align: center;
+          line-height: 50px;
+          font-family: PingFang-SC-Medium;
+          font-size: 30px;
+          float: left;
+          color: rgb(255, 255, 255);
+          border-radius: 10px;
         }
-        .sure{
-          background-color: rgb(77,50,177);
+        .sure {
+          background-color: rgb(77, 50, 177);
         }
-         .no{
-          background-color: rgb(41,52,75);
+        .no {
+          background-color: rgb(41, 52, 75);
           margin-left: 51px;
         }
       }
     }
   }
 
-  .pages{
+  .pages {
     width: 100%;
     height: 50px;
     margin-top: 50px;
     text-align: center;
     line-height: 50px;
   }
-
-
 }
-
 </style>
 

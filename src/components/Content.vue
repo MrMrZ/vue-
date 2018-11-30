@@ -75,10 +75,23 @@ export default {
         alert("请输入手机号");
         return;
       }
+      if (that.phoneNum.length != 11) {
+        alert("请输入正确手机号");
+        return;
+      }
       var data = {
         phone: that.phoneNum
       };
       var token = localStorage.getItem("token");
+
+      if (!token) {
+        that.$router.push({
+          name: "Login",
+          params: {}
+        });
+        return;
+      }
+
       console.log(
         data,
         "===================请求参数",
@@ -202,6 +215,22 @@ export default {
       that.name = that.$route.params.name;
       console.log(that.name, "==============参数============");
     }
+  },
+  mounted() {
+    var that = this;
+    var token = localStorage.getItem("token");
+    if (!token) {
+      that.$router.push({
+        name: "Login",
+        params: {}
+      });
+      return;
+    }
+
+    if (localStorage.getItem("name")) {
+      that.name = localStorage.getItem("name");
+      console.log(localStorage.getItem("name"), "====================客服");
+    }
   }
 };
 </script>
@@ -210,7 +239,7 @@ export default {
 <style lang="less" scoped>
 .content {
   width: 100%;
-  height: 1080px;
+  // height: 1438px;
   background-color: rgb(30, 39, 58);
   .nav {
     width: 20%;

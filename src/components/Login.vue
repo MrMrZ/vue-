@@ -20,12 +20,12 @@
                     密&nbsp;&nbsp;&nbsp;&nbsp;码
                   </div>
                   <div class="right">
-                    <input type="password" v-model="password">
+                    <input type="password" v-model="password"  @keyup.enter="Login()">
                     <div class="tip" v-show="loginError">提示：{{tip}}</div>
                   </div>
                 </div>
               <!-- <router-link class="_router" to="/">  <div class="submit" @click="Login">登录</div> </router-link> -->
-            <div class="submit" @click="Login()">登录</div>    
+            <div class="submit" @click="Login()" >登录</div>    
           </div>
        </div>
    </div>
@@ -38,7 +38,7 @@ export default {
       username: "",
       password: "",
       loginError: false,
-      tip:'',
+      tip: ""
     };
   },
   methods: {
@@ -54,9 +54,12 @@ export default {
         .then(
           function(res) {
             if (res.data.status == "success") {
+              console.log(res.data, "=================登录成功");
+
               // 将token保存到本地
               localStorage.setItem("token", res.data.token);
-              console.log(res.data, "=================登录成功", res.headers);
+
+              localStorage.setItem("name", that.username);
 
               console.log(localStorage.getItem("token"), "============token");
               that.$router.push({
@@ -66,7 +69,7 @@ export default {
                 }
               });
             } else {
-              that.tip = res.data.msg
+              that.tip = res.data.msg;
               that.loginError = true;
               console.log(res.data, "=================请求失败", res.headers);
             }
