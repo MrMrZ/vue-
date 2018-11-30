@@ -50,15 +50,14 @@ export default {
   components: {},
 
   methods: {
-
-    cancel(){
+    cancel() {
       var that = this;
-        that.$router.push({
-          name: "Content",
-          params: {
-            // phoneNum: that.phoneNum
-          }
-        });
+      that.$router.push({
+        name: "Content",
+        params: {
+          // phoneNum: that.phoneNum
+        }
+      });
     },
     // 提交
     submit() {
@@ -70,6 +69,10 @@ export default {
         return;
       }
 
+      if (that.phoneNum.length != 11) {
+        alert("请输入正确手机号");
+        return;
+      }
       var data = {
         phone: that.phoneNum,
         realname: that.username,
@@ -125,6 +128,14 @@ export default {
           function(err) {
             if (err.response) {
               console.log(err.response, "=================失败");
+              if (err.response.status === 401) {
+                that.$router.push({
+                  name: "Login",
+                  params: {
+                    // info: that.info
+                  }
+                });
+              }
               //控制台打印错误返回的内容
             }
             //bind(this)可以不用
@@ -231,8 +242,9 @@ export default {
       /deep/ .el-radio__inner {
         width: 24px;
         height: 24px;
+        margin-top: -8px;
       }
-      /deep/ .el-radio__inner::after{
+      /deep/ .el-radio__inner::after {
         width: 10px;
         height: 10px;
       }

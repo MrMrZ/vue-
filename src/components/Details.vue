@@ -252,6 +252,14 @@ export default {
             if (err.response) {
               console.log(err.response, "=================失败");
               //控制台打印错误返回的内容
+              if (err.response.status === 401) {
+                that.$router.push({
+                  name: "Login",
+                  params: {
+                    // info: that.info
+                  }
+                });
+              }
             }
             //bind(this)可以不用
           }.bind(this)
@@ -303,6 +311,14 @@ export default {
             if (err.response) {
               console.log(err.response, "=================失败");
               //控制台打印错误返回的内容
+              if (err.response.status === 401) {
+                that.$router.push({
+                  name: "Login",
+                  params: {
+                    // info: that.info
+                  }
+                });
+              }
             }
             //bind(this)可以不用
           }.bind(this)
@@ -354,6 +370,14 @@ export default {
             if (err.response) {
               console.log(err.response, "=================失败");
               //控制台打印错误返回的内容
+              if (err.response.status === 401) {
+                that.$router.push({
+                  name: "Login",
+                  params: {
+                    // info: that.info
+                  }
+                });
+              }
             }
             //bind(this)可以不用
           }.bind(this)
@@ -434,6 +458,14 @@ export default {
             if (err.response) {
               console.log(err.response, "=================失败");
               //控制台打印错误返回的内容
+              if (err.response.status === 401) {
+                that.$router.push({
+                  name: "Login",
+                  params: {
+                    // info: that.info
+                  }
+                });
+              }
             }
             //bind(this)可以不用
           }.bind(this)
@@ -472,7 +504,7 @@ export default {
   height: auto;
   // padding-bottom: 50px;
   .message {
-    width: 1250px;
+    width: 1470px;
     height: 293px;
     margin-left: 101px;
     margin-top: 36px;
@@ -489,7 +521,7 @@ export default {
       border-radius: 20px;
       box-sizing: border-box;
       padding-left: 48px;
-      padding-top: 30px;
+      padding-top: 10px;
       margin: 20px;
       .msg_con {
         width: 70%;
@@ -542,7 +574,9 @@ export default {
           .w200 {
             width: 70%;
             input {
-              padding-top: 9px;
+                height: 80px;
+
+              // padding-top: 9px;
               padding-bottom: 8px;
               font-size: 30px;
             }
@@ -629,7 +663,7 @@ export default {
   }
 
   .record_con {
-    width: 1250px;
+    width: 1470px;
     // height: 293px;
     margin-left: 101px;
     margin-top: 36px;
@@ -689,7 +723,7 @@ export default {
         ul {
           padding-left: 0;
           li {
-            width: 80%;
+            width: 98%;
             height: 80px;
             line-height: 80px;
             background-color: rgb(61, 75, 108);
@@ -936,7 +970,7 @@ export default {
           border-radius: 10px;
         }
         .sure {
-          background-color: rgb(77, 50, 177);
+          background-color: rgb(90, 58, 208);
         }
         .no {
           background-color: rgb(41, 52, 75);

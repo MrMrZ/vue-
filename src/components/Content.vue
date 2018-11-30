@@ -11,7 +11,7 @@
         </div>
           <div class="search">
               <i class="el-icon-search search_icon" @click="search"></i>
-              <input type="text" placeholder="输入完整手机号码" v-model="phoneNum" @input="toSearch"  @keyup.enter="search">
+              <input type="text" placeholder="输入完整手机号" v-model="phoneNum" @input="toSearch"  @keyup.enter="search">
          </div>
          <div class="line"></div>
              <!-- 创建新用户弹框 -->
@@ -173,6 +173,14 @@ export default {
             if (err.response) {
               console.log(err.response, "=================失败");
               //控制台打印错误返回的内容
+              if (err.response.status === 401) {
+                that.$router.push({
+                  name: "Login",
+                  params: {
+                    // info: that.info
+                  }
+                });
+              }
             }
             //bind(this)可以不用
           }.bind(this)
@@ -242,18 +250,21 @@ export default {
   // height: 1438px;
   background-color: rgb(30, 39, 58);
   .nav {
-    width: 20%;
+    width:10%;
     float: left;
   }
   .box {
-    width: 80%;
+    width: 90%;
     float: right;
+  height: 1438px;
+  background-color: rgb(30, 39, 58);
+    
     .user {
       width: 100%;
       height: 102px;
       background-color: rgb(58, 72, 104);
       box-sizing: border-box;
-      padding-right: 70px;
+      padding-right: 90px;
       position: relative;
       z-index: 22;
       .username {
@@ -316,12 +327,17 @@ export default {
         background-color: rgb(23, 31, 46);
         border-radius: 6px;
         font-family: PingFang-SC-Bold;
-        font-size: 36px;
-        color: #fff;
+        font-size: 30px;
         float: right;
         margin-right: 121px;
         border: none;
+        text-align: center;
+        color:#fff;
       }
+       input::-webkit-input-placeholder{
+        color: rgb(32,112,231);
+         
+       }
 
       .search_icon {
         width: 54px;
@@ -337,7 +353,7 @@ export default {
       }
     }
     .line {
-      width: 1270px;
+      width: 1470px;
       height: 2px;
       background-color: rgb(72, 92, 133);
       margin-top: 148px;
