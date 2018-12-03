@@ -24,7 +24,7 @@
                 </div>
             </div> -->
 
-            <router-view v-if="isRouterAlive"/>
+        <router-view v-if="isRouterAlive"/>
 
       </div>
 
@@ -251,12 +251,13 @@ export default {
   background-color: rgb(30, 39, 58);
   .nav {
     width:10%;
+    height: 100%;
     float: left;
   }
   .box {
     width: 90%;
     float: right;
-  height: 1438px;
+  // height: 1438px;
   background-color: rgb(30, 39, 58);
     
     .user {

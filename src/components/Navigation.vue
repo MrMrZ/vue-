@@ -19,7 +19,8 @@ export default {
 <style lang="less" scoped>
 .content1{
   width: 100%;
-  height: 1438px;
+  // height: 1438px;
+  height: 100%;
   float: left;
   background-color: rgb(18,23,34);
   box-sizing: border-box;

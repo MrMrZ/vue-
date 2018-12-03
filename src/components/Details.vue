@@ -36,7 +36,7 @@
         <div class="record_con">
               <div class="title_con">
                   <div class="title">记录</div>
-                  <div class="add_record" @click="isAddRecord=true">新增记录</div>
+                  <div class="add_record" @click="isAddRecord=true" v-show="false">新增记录</div>
               </div>
 
               <div class="record_list" :class="{'pgtb':list.length>0}" v-show="list.length>0">
@@ -60,14 +60,7 @@
               </div>
         </div>
 
-        <div class="pages">
-            <!-- <el-pagination
-            background
-            small
-            layout="prev, pager, next"
-            :total="50">
-          </el-pagination> -->
-        </div>
+       
     
 
      <div class="mask" v-show="isAddRecord" >
@@ -128,9 +121,140 @@
 
         </div>
      </div>
+   <div class="new_record">
+          <div class="title">新增记录</div>
+          <div class="time_msg">
+            <div class="left">
+                 <div class="type">记录类型</div>
+                 <div class="_select">
+                   <el-select v-model="caty" placeholder="请选择" >
+                      <el-option
+                        v-for="item in options"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value">
+                      </el-option>
+                    </el-select>
+                 </div>
+                  
+                                  
+            </div>
+            <div class="right">
+              <div class="time_des">
+                   <span>通话时间</span>
+                   <span>通话时长</span>
+              </div>
+              <div class="_time_det">
+                <div class="date">
+                    <el-date-picker class="select_time"
+                      v-model="start_time"
+                      type="datetime"
+                      value-format="timestamp"
+                      placeholder=""
+                      default-time	
+                      default-value	>
+                    </el-date-picker>
+                </div>
+                <div class="long">
+                     <input class="minute"  type="text" v-model="talk_time">
+                     分钟
+                </div>
+              </div>
+            </div>
+          </div>
 
-     <!-- 添加记录弹框 -->
-     
+
+           <div class="remark_con">
+             <div class="add_remark">备注</div>
+              <div class="add_txt">
+                <!-- <input type="text" v-model="remarks" > -->
+                <textarea name="" id=""  v-model="remarks"></textarea>
+            </div>
+           
+           </div>
+
+            <div class="more">
+                  <div class="more_txt" >
+                        <span>更多</span>
+                          <i class="el-icon-caret-bottom  triangle" v-show="isShowOthers==2" @click="showMore(2)"></i>
+                          <i class="el-icon-caret-top  triangle" v-show="isShowOthers==1" @click="showMore(1)"></i>
+                  </div>
+
+                  <div class="more_list" v-show="isShowOthers==2">
+                        <ul>
+                          <li  class="more_item">
+                             <el-select v-model="cars" placeholder="车辆" class="more_sel" >
+                                <el-option
+                                  v-for="item in options1"
+                                  :key="item.value"
+                                  :label="item.label"
+                                  :value="item.value">
+                                </el-option>
+                              </el-select>
+                          </li>
+                          <li  class="more_item">
+                            <el-select v-model="jobs" placeholder="职业" class="more_sel" >
+                                <el-option
+                                  v-for="item in optioins2"
+                                  :key="item.value"
+                                  :label="item.label"
+                                  :value="item.value">
+                                </el-option>
+                              </el-select>
+                          </li>
+                         
+                          <li  class="more_item" >
+                             <el-select v-model="marriage" placeholder="婚姻" class="more_sel" >
+                                <el-option
+                                  v-for="item in options3"
+                                  :key="item.value"
+                                  :label="item.label"
+                                  :value="item.value">
+                                </el-option>
+                              </el-select>
+                          </li >
+                            <li  class="more_item" style="margin-right:0">
+                             <el-select v-model="years" placeholder="年龄" class="more_sel" >
+                                <el-option
+                                  v-for="item in options4"
+                                  :key="item.value"
+                                  :label="item.label"
+                                  :value="item.value">
+                                </el-option>
+                              </el-select>
+                          </li>
+                            <li  class="more_item">
+                              <el-select v-model="kids" placeholder="孩子" class="more_sel" >
+                                <el-option
+                                  v-for="item in options5"
+                                  :key="item.value"
+                                  :label="item.label"
+                                  :value="item.value">
+                                </el-option>
+                              </el-select>
+                            </li>
+                        
+                          
+                          <li  class="more_item">
+                              <el-select v-model="areas" placeholder="地点" class="more_sel" >
+                                <el-option
+                                  v-for="item in options6"
+                                  :key="item.value"
+                                  :label="item.label"
+                                  :value="item.value">
+                                </el-option>
+                              </el-select>
+                          </li>
+                        </ul>
+                  </div>
+            </div>
+            <div class="button_con">
+                 <div class="sure" @click="addRecord" >新增记录</div>
+                 <div class="no"  @click="clearInput" >取消</div>
+            </div>
+
+        </div>
+     <!-- 添加记录弹框 --> 
       </div>
 
   
@@ -149,7 +273,7 @@ export default {
       value1: "",
       caty: "", //1,拨入,2,拨出
       talk_time: "", //通话时长
-      start_time: "", //通话开始时间
+      start_time: new Date(), //通话开始时间
       remarks: "", //备注
       username: "",
       id: "", //当前用户id
@@ -172,12 +296,149 @@ export default {
           value: "2",
           label: "拨出"
         }
-      ]
+      ],
+
+      options1: [
+        {
+          label: "1辆",
+          value: "1"
+        },
+        {
+          label: "2辆",
+          value: "2"
+        }
+      ], //车辆
+      optioins2: [
+        {
+          label: "老板",
+          value: "1"
+        },
+        {
+          label: "业务",
+          value: "2"
+        },
+        {
+          label: "其他",
+          value: "3"
+        }
+      ], //职业
+      options3: [
+        {
+          label: "未婚",
+          value: "1"
+        },
+        {
+          label: "已婚",
+          value: "2"
+        }
+      ], //婚姻
+      options4: [
+        {
+          label: "18~25",
+          value: "1"
+        },
+        {
+          label: "26~30",
+          value: "2"
+        },
+        {
+          label: "30~40",
+          value: "3"
+        },
+        {
+          label: "40以上",
+          value: "4"
+        }
+      ], //年龄
+      options5: [
+        {
+          label: "1个",
+          value: "1"
+        },
+        {
+          label: "2个",
+          value: "2"
+        },
+        {
+          label: "2个以上",
+          value: "3"
+        }
+      ], //孩子
+      options6: [
+        {
+          label: "海珠",
+          value: "1"
+        },
+        {
+          label: "越秀",
+          value: "2"
+        },
+        {
+          label: "天河",
+          value: "3"
+        },
+        {
+          label: "白云",
+          value: "4"
+        },
+
+        {
+          label: "荔湾",
+          value: "5"
+        },
+        {
+          label: "萝岗",
+          value: "6"
+        },
+        {
+          label: "南沙",
+          value: "7"
+        },
+        {
+          label: "花都",
+          value: "8"
+        },
+        {
+          label: "番禺",
+          value: "9"
+        },
+        {
+          label: "黄埔",
+          value: "10"
+        }
+      ], //地点
+      cars: "",
+      jobs: "",
+      marriage: "",
+      years: "",
+      kids: "",
+      areas: "",
+      isShowOthers:1,
     };
   },
   components: {},
 
   methods: {
+
+      // 取消，清空输入框
+      clearInput(){
+        var that = this;
+        that.caty= '';
+        that.talk_time = "";
+        that.start_time = "";
+        that.remarks = "";
+      },
+      // 是否展示更多
+      showMore(index){
+          var that = this;
+          if(index == 2){
+             that.isShowOthers = 1;
+          }else{
+             that.isShowOthers = 2;
+          }
+
+      },
+
     timestampToTime(timestamp) {
       var date = new Date(timestamp * 1000); //时间戳为10位需*1000，时间戳为13位的话不需乘1000
       var Y = date.getFullYear() + "年";
@@ -440,11 +701,10 @@ export default {
           function(res) {
             console.log(res.data, "=================添加记录成功");
             if (res.data.status == "success") {
-
-              that.caty = '';
-              that.talk_time = '';
-              that.start_time = '';
-              that.remarks = '';
+              that.caty = "";
+              that.talk_time = "";
+              that.start_time = "";
+              that.remarks = "";
               that.getRecord();
               that.isAddRecord = false;
             }
@@ -502,7 +762,8 @@ export default {
   // padding-left: 22px;
   background-color: rgb(30, 39, 58);
   height: auto;
-  // padding-bottom: 50px;
+  padding-bottom: 50px;
+
   .message {
     width: 1470px;
     height: 293px;
@@ -574,7 +835,7 @@ export default {
           .w200 {
             width: 70%;
             input {
-                height: 80px;
+              height: 80px;
 
               // padding-top: 9px;
               padding-bottom: 8px;
@@ -620,8 +881,8 @@ export default {
               width: 10px;
               height: 10px;
             }
-            .el-radio__input.is-disabled.is-checked .el-radio__inner::after{
-                background-color: #409EFF;
+            .el-radio__input.is-disabled.is-checked .el-radio__inner::after {
+              background-color: #409eff;
             }
           }
 
@@ -780,202 +1041,274 @@ export default {
     left: 0;
     top: 0;
     z-index: 999;
-    .new_record {
-      width: 916px;
-      height: 540px;
-      background-color: rgb(52, 69, 104);
-      margin: 180px auto;
-      border-radius: 20px;
-      box-sizing: border-box;
-      padding-left: 40px;
-      padding-top: 27px;
-      padding-right: 43px;
-      .title {
-        font-family: PingFang-SC-Medium;
-        font-size: 36px;
-        color: #fff;
+  }
+
+  .new_record {
+    width: 916px;
+    // height: 580px;
+    background-color: rgb(52, 69, 104);
+    margin-left: 101px;
+    margin-top: 39px;
+    border-radius: 20px;
+    box-sizing: border-box;
+    padding: 27px 43px 30px 40px;
+    .title {
+      font-family: PingFang-SC-Medium;
+      font-size: 36px;
+      color: #fff;
+    }
+    .time_msg {
+      width: 100%;
+      // height: 100px;
+      margin-top: 20px;
+      overflow: hidden;
+      .left {
+        width: 30%;
+        height: 100%;
+        float: left;
+        .type {
+          font-family: PingFang-SC-Medium;
+          font-size: 23px;
+          color: #fff;
+        }
+        ._select {
+          width: 175px;
+          height: 73px;
+          border-radius: 10px;
+          outline: none;
+          font-size: 29px;
+          font-family: PingFang-SC-Medium;
+          color: #fff;
+          text-align: center;
+          margin-top: 19px;
+          border: none;
+          background-color: rgb(75, 92, 132);
+          box-sizing: border-box;
+          padding-left: 10px;
+          padding-right: 10px;
+          padding-top: 10px;
+          /deep/.el-input__inner {
+            font-size: 18px;
+            color: #fff;
+            background-color: rgb(35, 46, 69);
+            border: 1px solid rgb(117, 136, 177);
+          }
+          /deep/.el-select-dropdown__item {
+            span {
+              font-size: 18px !important;
+            }
+          }
+          /deep/.el-select-dropdown__item.selected {
+            font-size: 18px;
+          }
+          ._option {
+            width: 175px;
+            height: 75px;
+            border-radius: 10px;
+          }
+        }
       }
-      .time_msg {
-        width: 100%;
-        // height: 100px;
-        margin-top: 20px;
-        overflow: hidden;
-        .left {
-          width: 30%;
-          height: 100%;
-          float: left;
-          .type {
+      .right {
+        width: 68%;
+        height: 100%;
+        float: right;
+        .time_des {
+          width: 100%;
+          display: inline-block;
+          clear: both;
+          span:first-child {
+            width: 64%;
+            height: 100%;
+            float: left;
+          }
+          span:last-child {
+            width: 35%;
+            height: 100%;
+
+            float: right;
+          }
+          span {
             font-family: PingFang-SC-Medium;
             font-size: 23px;
             color: #fff;
           }
-          ._select {
-            width: 175px;
-            height: 73px;
-            border-radius: 10px;
-            outline: none;
-            font-size: 29px;
-            font-family: PingFang-SC-Medium;
-            color: #fff;
-            text-align: center;
-            margin-top: 19px;
-            border: none;
-            // appearance: none;
-            // -moz-appearance: none;
-            // -webkit-appearance: none;
-            // background: url("../assets/tri.png") no-repeat scroll right center
-            //   transparent;
-            background-color: rgb(75, 92, 132);
-            box-sizing: border-box;
-            padding-left: 10px;
-            padding-right: 10px;
-            padding-top: 10px;
+        }
+        ._time_det {
+          width: 100%;
+          height: 73px;
+          border-radius: 10px;
+          background-color: rgb(75, 92, 132);
+          clear: both;
+          font-family: PingFang-SC-Medium;
+          color: #fff;
+          font-size: 29px;
+          line-height: 73px;
+          box-sizing: border-box;
+          padding-left: 24px;
+          padding-right: 24px;
+          margin-top: 14px;
 
-            ._option {
-              width: 175px;
-              height: 75px;
-              border-radius: 10px;
+          .date {
+            float: left;
+            position: relative;
+            .select_time {
+              position: absolute;
+              top: 0px;
+              .el-input__inner {
+                background-color: rgb(35, 46, 69);
+                border: 1px solid rgb(117, 136, 177);
+              }
+            }
+            /deep/.el-input__inner {
+              color: #fff;
+              font-size: 16px;
             }
           }
-        }
-        .right {
-          width: 68%;
-          height: 100%;
-          float: right;
-          .time_des {
-            width: 100%;
-            display: inline-block;
-            clear: both;
-            span:first-child {
-              width: 64%;
-              height: 100%;
-              float: left;
-            }
-            span:last-child {
-              width: 35%;
-              height: 100%;
-
-              float: right;
-            }
-            span {
+          .long {
+            float: right;
+            .minute {
+              display: inline-block;
+              width: 113px;
+              height: 53px;
+              text-align: center;
+              line-height: 53px;
+              background-color: rgb(35, 46, 69);
+              border: 1px solid rgb(117, 136, 177);
+              border-radius: 6px;
+              outline: none;
               font-family: PingFang-SC-Medium;
-              font-size: 23px;
+              font-size: 29px;
               color: #fff;
             }
           }
-          ._time_det {
-            width: 100%;
-            height: 73px;
-            border-radius: 10px;
-            background-color: rgb(75, 92, 132);
-            clear: both;
-            font-family: PingFang-SC-Medium;
-            color: #fff;
-            font-size: 29px;
-            line-height: 73px;
-            box-sizing: border-box;
-            padding-left: 24px;
-            padding-right: 24px;
-            margin-top: 14px;
-
-            .date {
-              float: left;
-              position: relative;
-              .select_time {
-                position: absolute;
-                top: 0px;
-                .el-input__inner {
-                  background: none;
-                }
-              }
-              /deep/.el-input__inner{
-                   color:#fff;
-                   font-size: 16px;
-              }
-            }
-            .long {
-              float: right;
-              .minute {
-                display: inline-block;
-                width: 113px;
-                height: 53px;
-                text-align: center;
-                line-height: 53px;
-                background-color: rgb(35, 46, 69);
-                border: 1px solid rgb(117, 136, 177);
-                border-radius: 6px;
-                outline: none;
-                font-family: PingFang-SC-Medium;
-                font-size: 29px;
-                color: #fff;
-              }
-            }
-          }
         }
       }
-      .remark_con {
-        overflow: hidden;
-          margin-top: 68px;
-        
-        .add_remark{
-          width: 10%;
-          height: 86px;
-          float: left;
-          text-align: left;
-          line-height: 86px;
-          color:#fff;
-          font-size: 30px;
-        }
-        .add_txt {
-          width: 88%;
-          height: 86px;
-          border: 1px solid rgb(117, 136, 177);
-          background-color: rgb(35, 46, 69);
-          border-radius: 10px;
+    }
+    .remark_con {
+      margin-top: 68px;
+      overflow: hidden;
+      .add_remark {
+        width: 10%;
+        height: 86px;
+        float: left;
+        text-align: left;
+        line-height: 86px;
+        color: #fff;
+        font-size: 30px;
+      }
+      .add_txt {
+        width: 88%;
+        height: 86px;
+        border: 1px solid rgb(117, 136, 177);
+        background-color: rgb(35, 46, 69);
+        border-radius: 10px;
+        font-family: PingFang-SC-Medium;
+        font-size: 30px;
+        color: #fff;
+        float: left;
+        textarea {
+          width: 100%;
+          height: 100%;
+          background: none;
+          outline: none;
           font-family: PingFang-SC-Medium;
           font-size: 30px;
           color: #fff;
+          border: none;
+          box-sizing: border-box;
+          padding-left: 18px;
+        }
+      }
+    }
+    .more {
+      width: 100%;
+      // height: 240px;
+      margin-top: 26px;
+      .more_txt {
+        overflow: hidden;
+        span:first-child {
+          display: inline-block;
+          font-family: PingFang-SC-Medium;
+          font-size: 24px;
+          color: #fff;
           float: left;
-          input {
-            width: 100%;
-            height: 100%;
-            background: none;
-            outline: none;
-            font-family: PingFang-SC-Medium;
-            font-size: 30px;
-            color: #fff;
-            border: none;
+        }
+        .triangle {
+          display: inline-block;
+          color: rgb(101, 144, 238);
+          font-size: 36px;
+          float: left;
+        }
+      }
+      .more_list {
+        width: 100%;
+        ul {
+          width: 100%;
+          height: 100%;
+          display: flex;
+          flex-wrap: wrap;
+
+          li {
+            width: 171px;
+            height: 73px;
+            border-radius: 10px;
+            background-color: rgb(75, 92, 132);
+            text-align: center;
+            line-height: 73px;
+            margin-right: 42px;
+            margin-top: 24px;
             box-sizing: border-box;
-            padding-left: 18px;
+            padding-top: 5px;
+            .more_sel {
+              color: #fff;
+            }
+            /deep/.el-input__inner {
+              font-family: PingFang-SC-Medium;
+              font-size: 29px;
+              color: #fff;
+              text-align: center;
+              border: none;
+              background: none;
+            }
+
+            /deep/ .el-input__icon {
+              width: 100%;
+              margin-right: 25px;
+              margin-top: -10px;
+            }
+
+            /deep/ .el-icon-arrow-up {
+              font-size: 28px;
+              color: #fff;
+            }
           }
         }
       }
-
-      .button_con {
-        width: 100%;
+    }
+    .button_con {
+      width: 100%;
+      height: 50px;
+      overflow: hidden;
+      margin-top: 50px;
+      box-sizing: border-box;
+      padding-left: 201px;
+      div {
+        width: 205px;
         height: 50px;
-        overflow: hidden;
-        margin-top: 50px;
-        box-sizing: border-box;
-        padding-left: 201px;
-        div {
-          width: 205px;
-          height: 50px;
-          text-align: center;
-          line-height: 50px;
-          font-family: PingFang-SC-Medium;
-          font-size: 30px;
-          float: left;
-          color: rgb(255, 255, 255);
-          border-radius: 10px;
-        }
-        .sure {
-          background-color: rgb(90, 58, 208);
-        }
-        .no {
-          background-color: rgb(41, 52, 75);
-          margin-left: 51px;
-        }
+        text-align: center;
+        line-height: 50px;
+        font-family: PingFang-SC-Medium;
+        font-size: 30px;
+        float: left;
+        color: rgb(255, 255, 255);
+        border-radius: 10px;
+      }
+      .sure {
+        background-color: rgb(90, 58, 208);
+      }
+      .no {
+        background-color: rgb(41, 52, 75);
+        margin-left: 51px;
       }
     }
   }
