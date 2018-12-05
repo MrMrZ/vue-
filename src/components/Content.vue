@@ -13,20 +13,12 @@
              <img src="../assets/mine.png" alt="" class="mine" >
             <div class="quit" v-show="isLogout" @click="logout">注销</div>
         </div>
-        <div class="search">
-            <i class="el-icon-search search_icon" @click="search"></i>
+        <div class="search" v-show="false">
+            <i class="el-icon-search search_icon" @click="toSearch"></i>
             <input type="text" placeholder="输入完整手机号" v-model="phoneNum" @input="toSearch"  @keyup.enter="search">
         </div>
-         <div class="line"></div>
-             <!-- 创建新用户弹框 -->
-            <!-- <div class="Tip" v-show="isNew">
-                <div class="title" v-show="phoneNum">{{phoneNum}}</div>
-                <div class="msg">这是新用户，是否创建？</div>
-                <div class="btn">
-                    <div class="quit" @click="isNew=false">取消</div>
-                    <div class="sure" @click="toAdd">创建新用户</div>
-                </div>
-            </div> -->
+         <div class="line" v-show="false"></div>
+
         <router-view v-if="isRouterAlive"/>
       </div>
    </div>
@@ -50,7 +42,8 @@ export default {
       info: {},
       isRouterAlive: true,
       isLogout: false,
-      name: "" //当前登录客服
+      name: "", //当前登录客服
+      showSearch:1
     };
   },
   components: {
@@ -221,6 +214,11 @@ export default {
       that.name = that.$route.params.name;
       console.log(that.name, "==============参数============");
     }
+    //获取传入的参数
+    if (that.$route.params.showSearch) {
+       that.showSearch = that.$route.params.showSearch;
+       console.log( that.showSearch ,'======================2222');
+      }
   },
   mounted() {
     var that = this;
@@ -249,7 +247,7 @@ export default {
 <style lang="less" scoped>
 .content {
   width: 100%;
-
+  min-height: 1080px;
   background-color: rgb(30, 39, 58);
   display: flex;
   .nav {

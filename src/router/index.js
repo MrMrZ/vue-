@@ -7,6 +7,7 @@ import Content from '@/components/Content'
 import AddUser from '@/components/AddUser'
 import Details from '@/components/Details'
 import NewUser from '@/components/NewUser'
+import TheMap from '@/components/Map'
 
 
 Vue.use(Router)
@@ -48,6 +49,11 @@ export default new Router({
           path: 'newuser',
           name: 'NewUser',
           component: NewUser
+        },
+        {
+          path: 'map',
+          name: 'Map',
+          component:TheMap
         }
       ]
     },
