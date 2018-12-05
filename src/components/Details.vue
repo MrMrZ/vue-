@@ -1,5 +1,5 @@
 <template>
-   <div class="content" >
+   <div class="content2" >
      
         <!-- 用户信息 -->
         <div class="message">
@@ -754,16 +754,13 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style lang="less" >
-.content {
+<style lang="less"  >
+.content2 {
   width: 100%;
   float: left;
   box-sizing: border-box;
-  // padding-left: 22px;
   background-color: rgb(30, 39, 58);
-  height: auto;
   padding-bottom: 50px;
-
   .message {
     width: 1470px;
     height: 293px;

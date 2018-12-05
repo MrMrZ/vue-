@@ -1,5 +1,5 @@
 <template>
-   <div class="content1">
+   <div class="content1" >
        <div class="title1">录入</div>
    </div>
 </template>
@@ -19,7 +19,7 @@ export default {
 <style lang="less" scoped>
 .content1{
   width: 100%;
-  // height: 1438px;
+  // min-height: 1080px;
   height: 100%;
   float: left;
   background-color: rgb(18,23,34);
@@ -34,7 +34,6 @@ export default {
     font-size: 40px;
     font-family: PingFang-SC-Medium;
     color:#fff;
-    
   }
 }
 </style>

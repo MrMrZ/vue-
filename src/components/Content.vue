@@ -1,6 +1,10 @@
 <template>
    <div class="content"  >
-      <div class="nav"><Navigation></Navigation></div>
+     <!-- 左边导航 -->
+      <div class="nav" >
+           <Navigation></Navigation>
+      </div>
+      <!-- 右边内容 -->
       <div class="box">
         <div class="user">
             <i class="el-icon-caret-bottom logout" v-show="!isLogout" @click="isLogout=true"></i>
@@ -9,10 +13,10 @@
              <img src="../assets/mine.png" alt="" class="mine" >
             <div class="quit" v-show="isLogout" @click="logout">注销</div>
         </div>
-          <div class="search">
-              <i class="el-icon-search search_icon" @click="search"></i>
-              <input type="text" placeholder="输入完整手机号" v-model="phoneNum" @input="toSearch"  @keyup.enter="search">
-         </div>
+        <div class="search">
+            <i class="el-icon-search search_icon" @click="search"></i>
+            <input type="text" placeholder="输入完整手机号" v-model="phoneNum" @input="toSearch"  @keyup.enter="search">
+        </div>
          <div class="line"></div>
              <!-- 创建新用户弹框 -->
             <!-- <div class="Tip" v-show="isNew">
@@ -23,14 +27,8 @@
                     <div class="sure" @click="toAdd">创建新用户</div>
                 </div>
             </div> -->
-
         <router-view v-if="isRouterAlive"/>
-
       </div>
-
-     
-    
-
    </div>
 
 </template>
@@ -239,7 +237,11 @@ export default {
       that.name = localStorage.getItem("name");
       console.log(localStorage.getItem("name"), "====================客服");
     }
+
+    console.log( document.documentElement.scrollHeight,'==================屏幕高度')
+
   }
+
 };
 </script>
 
@@ -247,19 +249,18 @@ export default {
 <style lang="less" scoped>
 .content {
   width: 100%;
-  // height: 1438px;
+
   background-color: rgb(30, 39, 58);
+  display: flex;
   .nav {
     width:10%;
-    height: 100%;
-    float: left;
+    // height: 100%;
+    flex: auto;
   }
   .box {
     width: 90%;
-    float: right;
-  // height: 1438px;
-  background-color: rgb(30, 39, 58);
-    
+    flex: auto;
+    background-color: rgb(30, 39, 58);
     .user {
       width: 100%;
       height: 102px;
