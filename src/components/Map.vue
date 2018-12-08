@@ -2,33 +2,34 @@
    <div class="cont">
         <div class="search_left">
               <div class="search_bar">
-                     <input type="text">
-                     <i class="el-icon-search search_icon"></i>
+                     <input type="text" v-model="name" @keyup="search">
+                     <i class="el-icon-search search_icon" @click="search"></i>
               </div>
 
               <div class="lists">
-                      <ul class="list">
-                        <li  :class="{'active':isDetails==1}">
+                      <ul class="list" ref="list">
+                        <li  :class="{'active':isDetails==index}" v-for="(item , index ) in stopList" :key="index" >
                             <div class="name_msg">
-                              <span class="el-icon-star-on "></span>
-                              <span class="type">粤</span>
-                              <span class="stopName">大舜丽池(天河区中山大道西汉正街一号)</span>
+                              <span class="el-icon-star-on " v-if="item.work==1"></span>
+                              <span class="type" v-if="item.cuisine">{{item.cuisine}}</span>
+
+                              <span class="stopName">{{item.name}}</span>
                             </div>
                             <div class="stop_phone">
-                              <span class="price">188/元</span>
-                              <span class="number">020-23360089</span>
+                              <span class="price"><span> &yen; </span>{{item.per_person}}/元</span>
+                              <span class="number">{{item.telphone}}</span>
                             </div>
-                             <div v-show="isDetails === 1">
+                             <div v-show="isDetails === index">
                                 <div class="location">
-                              广州天河区林和西路中信广场大厦旁
+                                      {{item.address}} 
                             </div>
                             <div class="_input">
                                  <div class="user_phone">手机号:</div>
-                                 <div class="input_num"><input type="text"></div>
+                                 <div class="input_num"><input type="text" v-model="user_phone"></div>
                             </div>
                              <div class="_input">
                                  <div class="user_phone">称呼:</div>
-                                 <div class="input_num w90"><input type="text"></div>
+                                 <div class="input_num w90"><input type="text" v-model="username"></div>
                                  <div class="sex_con">
                                       <el-radio v-model="sex" label="1">先生</el-radio>
                                       <el-radio v-model="sex" label="2">女士</el-radio>
@@ -49,78 +50,22 @@
                                  </div>
                                  </div>
                             </div>
-                            <div class="submit">发送短信</div>
+                            <div class="submit" @click="sendMsg(item.id)">发送短信</div>
                              </div>
                             <div class="showDes">
-                              <i class="el-icon-caret-top triangle" v-show="isDetails == 0" @click="showDes(1)"></i>
-                              <i class="el-icon-caret-bottom triangle" v-show="isDetails ==1"  @click="showDes(0)"></i>
-
-                            </div>
-                        </li>
-                        <li>
-                            <div class="name_msg">
-                              <span class="el-icon-star-on "></span>
-                              <span class="type">粤</span>
-                              <span class="stopName">大舜丽池(天河区中山大道西汉正街一号)</span>
-                            </div>
-                            <div class="stop_phone">
-                              <span class="price">188/元</span>
-                              <span class="number">020-23360089</span>
-                            </div>
-                            <div class="showDes">
-                              <i class="el-icon-caret-top triangle"></i>
-                            </div>
-                        </li>
-                           <li>
-                            <div class="name_msg">
-                              <span class="el-icon-star-on "></span>
-                              <span class="type">粤</span>
-                              <span class="stopName">大舜丽池(天河区中山大道西汉正街一号)</span>
-                            </div>
-                            <div class="stop_phone">
-                              <span class="price">188/元</span>
-                              <span class="number">020-23360089</span>
-                            </div>
-                            <div class="showDes">
-                              <i class="el-icon-caret-top triangle"></i>
-                            </div>
-                        </li>
-                           <li>
-                            <div class="name_msg">
-                              <span class="el-icon-star-on "></span>
-                              <span class="type">粤</span>
-                              <span class="stopName">大舜丽池(天河区中山大道西汉正街一号)</span>
-                            </div>
-                            <div class="stop_phone">
-                              <span class="price">188/元</span>
-                              <span class="number">020-23360089</span>
-                            </div>
-                            <div class="showDes">
-                              <i class="el-icon-caret-top triangle"></i>
-                            </div>
-                        </li>
-                           <li>
-                            <div class="name_msg">
-                              <span class="el-icon-star-on "></span>
-                              <span class="type">粤</span>
-                              <span class="stopName">大舜丽池(天河区中山大道西汉正街一号)</span>
-                            </div>
-                            <div class="stop_phone">
-                              <span class="price">188/元</span>
-                              <span class="number">020-23360089</span>
-                            </div>
-                            <div class="showDes">
-                              <i class="el-icon-caret-top triangle"></i>
+                              <i class="el-icon-caret-bottom triangle" v-show="isShow == 0 
+                              " @click="showDes(1,index)"></i>
+                              <i class="el-icon-caret-top triangle" v-show="isShow == 1"  @click="showDes(0,index)"></i>
                             </div>
                         </li>
                       </ul>
               </div>
         </div>
         <div class="map_right " id ="container">
-               <div class="msg_con" v-show="showMsg" ref="msg">
-                 <span class="el-icon-star-on "></span>
-                  <span class="type">粤</span>
-                  <span class="stopName">大舜丽池</span>
+               <div class="msg_con" v-show="showMsg" ref="msg" >
+                  <span class="el-icon-star-on" v-if="star"></span>
+                  <span class="type" v-if="type">{{type}}</span>
+                  <span class="stopName">{{stopName}}</span>
                   <span class="el-icon-caret-bottom triangle2"></span>
                </div>
         </div>
@@ -135,79 +80,368 @@ export default {
       showMsg: false,
       infoWindow: "",
       map: "",
+      isDetails: -1,
+      stopList: [],
+      isShow: 0, //是否展示详情
+      name: "", //搜索
+
+      merchantsList: [], //商家列表
+
+      stopName: "",
+      type: "",
+      star: false,
+
+      username: "",
+      user_phone: "",
       sex: "",
       eat_time: new Date(),
-      isDetails: 0
+
+      locationIcon: "@/assets/location@2x.png",
+      centerLocation: [113.332124, 23.133135]
     };
   },
   components: {},
   methods: {
-    showMap() {
+    //自定义信息窗体
+    createInfoWindow(content) {
+      // 窗体容器
+      var info = document.createElement("div");
+      info.className = "msg_con";
+
+      //  里面内容
+      var star = document.createElement("span");
+      var type = document.createElement("span");
+      var stopName = document.createElement("span");
+      var triangle = document.createElement("span");
+
+      star.className = "el-icon-star-on";
+      type.className = "type";
+      stopName.className = "stopName";
+      triangle.className = "el-icon-caret-bottom triangle2";
+
+      if (content.cuisine) {
+        type.innerHTML = content.cuisine;
+      }
+
+      if (content.work) {
+        star.style.display = "none";
+      }
+
+      stopName.innerHTML = content.name;
+
+      info.appendChild(star);
+      info.appendChild(type);
+      info.appendChild(stopName);
+      info.appendChild(triangle);
+
+      return info;
+    },
+    showMap(lists) {
       var that = this;
+      var loca = [];
+
+      var lnglatsArr = []; //商家经纬度数组
+
+      for (var i = 0; i < lists.length; i++) {
+        var arr = [];
+        arr.push(lists[i].longitude); //经度
+        arr.push(lists[i].latitude); //纬度
+        lnglatsArr.push(arr); //经纬度集合
+      }
+
       // 创建地图实例
       that.map = new AMap.Map("container", {
         zoom: 13,
-        center: [116.4, 39.92],
-        resizeEnable: true
+        center: that.centerLocation,
+        resizeEnable: true,
+        icon:
+          "//a.amap.com/jsapi_demos/static/demo-center/icons/dir-via-marker.png"
       });
 
-      // // 创建一个 Marker 实例：
-      // var marker = new AMap.Marker({
-      //   position: new AMap.LngLat(116.39, 39.9), // 经纬度对象，也可以是经纬度构成的一维数组[116.39, 39.9]
-      //   title: "北京"
-      // });
+      if(that.centerLocation){
+         var marker1 = new AMap.Marker({
+            icon: "//power.anlly.net/fuyan/public/pc/current.png",
+            position:that.centerLocation,
+            offset: new AMap.Pixel(-13, -30)
+        });
+          marker1.setMap(that.map);
+      }
 
-      // // 将创建的点标记添加到已有的地图实例：
-      // map.add(marker);
-
-      // //使用上面例子已有的地图和点标记
-      // var infoWindow = new AMap.InfoWindow({
-      //   // isCustom: true, //使用自定义窗体
-      //   // content:"<div>信息窗体内容1</div><div>信息窗体内容2</div><div>信息窗体内容3</div>",//信息窗体的内容
-      //   content:that.$refs.msg,
-      //   offset: new AMap.Pixel(16, -45) //窗体位置的偏移量
-      // });
-      // //当点击点标记时出现信息窗体
-      // AMap.event.addListener(marker, "click", function() {
-      //      that.showMsg = true;
-      //      infoWindow.open(map, marker.getPosition());
-      // });
-
-      var lnglats = [
-        [116.368904, 39.923423],
-        [116.382122, 39.921176],
-        [116.387271, 39.922501],
-        [116.398258, 39.9146]
-      ];
+      var lnglats = lnglatsArr;
       that.infoWindow = new AMap.InfoWindow({
         isCustom: true,
         offset: new AMap.Pixel(0, -50)
       });
-      for (var i = 0, marker; i < lnglats.length; i++) {
+
+      for (var j = 0, marker; j < lnglats.length; j++) {
         var marker = new AMap.Marker({
-          position: lnglats[i],
-          map: that.map
+          position: lnglats[j],
+          map: that.map,
+          icon: "//power.anlly.net/fuyan/public/pc/location.png"
         });
+        marker.setExtData({ ext: that.merchantsList[j] });
+
         marker.content = that.$refs.msg;
+
         marker.on("click", that.markerClick);
         marker.emit("click", { target: marker });
       }
       that.map.setFitView();
     },
-    showDes(index) {
+    showDes(isShow, index) {
       var that = this;
-      that.isDetails = index;
+      if (that.isDetails == index) {
+        that.isDetails = -1;
+        that.isShow = isShow;
+      } else {
+        that.isShow = isShow;
+        that.isDetails = index;
+      }
     },
     markerClick(e) {
       var that = this;
       that.showMsg = true;
+      // e.target.getExtrData().ext;
+      that.stopName = e.target.getExtData().ext.name;
+      if (e.target.getExtData().ext.cuisine) {
+        that.type = e.target.getExtData().ext.cuisine;
+      } else {
+        that.type = "";
+      }
+      if (e.target.getExtData().ext.work) {
+        that.star = true;
+      } else {
+        that.star = false;
+      }
+
+      for (var i = 0; i < that.stopList.length; i++) {
+        if (that.stopList[i].id == e.target.getExtData().ext.id) {
+          that.isDetails = i;
+          // var r_h = i*152;
+          // that.$refs.list.animate({ scrollTop: r_h }, 800)
+        }
+      }
       that.infoWindow.setContent(e.target.content);
       that.infoWindow.open(that.map, e.target.getPosition());
+    },
+    // 搜索商家
+    search() {
+      var that = this;
+      var data = {
+        name: that.name
+      };
+      var token = localStorage.getItem("token");
+
+      if (!token) {
+        that.$router.push({
+          name: "Login",
+          params: {}
+        });
+        return;
+      }
+
+      console.log(
+        data,
+        "===================请求参数",
+        token,
+        "==========token"
+      );
+      that.axios
+        .get(
+          "https://power.anlly.net/fuyan/v1/service/search",
+          {
+            params: data,
+            headers: {
+              // "Access-Control-Allow-Origin": "*",
+              // "Content-Type": "application/json; charset=utf-8"
+              token: token
+            }
+          },
+          {
+            xhrFields: { withCredentials: true }
+          }
+        )
+        .then(
+          function(res) {
+            if (res.data.status == "success") {
+              that.stopList = res.data.list;
+              setTimeout(function() {
+                that.showMap(that.merchantsList);
+                var location = [];
+                 that.centerLocation = [];
+                location.push(Number(res.data.location.longitude));
+                location.push(Number(res.data.location.latitude));
+                that.centerLocation = location;
+                console.log(
+                  location,
+                  "=====================location"
+                );
+              }, 100);
+
+              console.log("======================搜索商家成功", red.data).list;
+            } else {
+              console.log(res.data, "=================请求失败");
+            }
+            //控制台打印请求成功时返回的数据
+            //bind(this)可以不用
+          }.bind(this)
+        )
+        .catch(
+          function(err) {
+            if (err.response) {
+              console.log(err.response, "=================失败");
+              //控制台打印错误返回的内容
+              if (err.response.status === 401) {
+                that.$router.push({
+                  name: "Login",
+                  params: {
+                    // info: that.info
+                  }
+                });
+              }
+            }
+            //bind(this)可以不用
+          }.bind(this)
+        );
+    },
+
+    // 获取商家列表
+    getStopLists() {
+      var that = this;
+
+      var token = localStorage.getItem("token");
+
+      if (!token) {
+        that.$router.push({
+          name: "Login",
+          params: {}
+        });
+        return;
+      }
+
+      console.log(token, "==========token");
+      that.axios
+        .get(
+          "https://power.anlly.net/fuyan/v1/service/business",
+          {
+            // params: data,
+            headers: {
+              // "Access-Control-Allow-Origin": "*",
+              // "Content-Type": "application/json; charset=utf-8"
+              token: token
+            }
+          },
+          {
+            xhrFields: { withCredentials: true }
+          }
+        )
+        .then(
+          function(res) {
+            if (res.data.status == "success") {
+              that.merchantsList = res.data.list;
+              console.log("======================获取商家列表", res.data.list);
+              setTimeout(function() {
+                that.showMap(that.merchantsList);
+              }, 100);
+            } else {
+              console.log(res.data, "=================请求失败");
+            }
+            //控制台打印请求成功时返回的数据
+            //bind(this)可以不用
+          }.bind(this)
+        )
+        .catch(
+          function(err) {
+            if (err.response) {
+              console.log(err.response, "=================失败");
+              //控制台打印错误返回的内容
+              if (err.response.status === 401) {
+                that.$router.push({
+                  name: "Login",
+                  params: {
+                    // info: that.info
+                  }
+                });
+              }
+            }
+            //bind(this)可以不用
+          }.bind(this)
+        );
+    },
+
+    //发短信
+    sendMsg(id) {
+      var that = this;
+      var data = {
+        name: that.username,
+        sex: that.sex,
+        phone: that.user_phone,
+        id: id,
+        eat_time: that.eat_time / 1000
+      };
+      var token = localStorage.getItem("token");
+
+      if (!token) {
+        that.$router.push({
+          name: "Login",
+          params: {}
+        });
+        return;
+      }
+
+      console.log(token, "==========token", data, "==========请求参数");
+      that.axios
+        .post(
+          "https://power.anlly.net/fuyan/v1/service/sms",
+          that.qs.stringify(data),
+          {
+            headers: {
+              // "Access-Control-Allow-Origin": "*",
+              // "Content-Type": "application/json; charset=utf-8"
+              token: token
+            }
+          }
+          // {
+          //   xhrFields: { withCredentials: true }
+          // }
+        )
+        .then(
+          function(res) {
+            if (res.data.status == "success") {
+              that.merchantsList = res.data.list;
+              console.log("======================发送成功", res.data.list);
+              setTimeout(function() {
+                that.showMap(that.merchantsList);
+              }, 100);
+            } else {
+              console.log(res.data.list, "=================发送失败");
+            }
+            //控制台打印请求成功时返回的数据
+            //bind(this)可以不用
+          }.bind(this)
+        )
+        .catch(
+          function(err) {
+            if (err.response) {
+              console.log(err.response, "=================失败");
+              //控制台打印错误返回的内容
+              if (err.response.status === 401) {
+                that.$router.push({
+                  name: "Login",
+                  params: {
+                    // info: that.info
+                  }
+                });
+              }
+            }
+            //bind(this)可以不用
+          }.bind(this)
+        );
     }
   },
   mounted() {
     var that = this;
-    that.showMap();
+    that.getStopLists();
   }
 };
 </script>
@@ -220,7 +454,7 @@ export default {
   display: flex;
   .search_left {
     width: 26%;
-    height: 1080px;
+    height: 1000px;
     // background-color: #cff;
     flex: auto;
     box-sizing: border-box;
@@ -254,7 +488,7 @@ export default {
     }
     .lists {
       width: 100%;
-      height: 970px;
+      height: 930px;
       margin-top: 20px;
       border-radius: 4px;
       background-color: rgb(48, 63, 95);
@@ -280,7 +514,7 @@ export default {
             }
             .type {
               display: inline-block;
-              width: 24px;
+              min-width: 24px;
               height: 24px;
               background-color: rgb(204, 158, 90);
               text-align: center;
@@ -289,6 +523,9 @@ export default {
               font-size: 20px;
               font-family: PingFang-SC-Bold;
               margin-left: 12px;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
             }
             .stopName {
               display: inline-block;
@@ -306,17 +543,28 @@ export default {
             width: 100%;
             margin-top: 19px;
             display: flex;
+            justify-content: space-around;
             .price {
+              width: 35%;
               font-family: PingFang-SC-Medium;
-              font-size: 30px;
+              font-size: 28px;
               color: #fff;
-              flex: auto;
+              // flex: auto;
+              // overflow: hidden;
+              // text-overflow: ellipsis;
+              // white-space: nowrap;
+              float: left;
             }
             .number {
+              width: 65%;
               margin-left: 25px;
               font-family: PingFang-SC-Medium;
-              font-size: 30px;
+              text-align: right;
+              font-size: 28px;
               color: #fff;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
             }
           }
           .location {
@@ -415,8 +663,8 @@ export default {
     height: 100%;
     background-color: #ffc;
     flex: auto;
-    .msg_con {
-      // width: 209px;
+    div.msg_con {
+      min-width: 209px;
       height: 50px;
       text-align: center;
       line-height: 50px;
@@ -438,7 +686,7 @@ export default {
       }
       .type {
         display: inline-block;
-        width: 24px;
+        min-width: 24px;
         height: 24px;
         background-color: rgb(204, 158, 90);
         text-align: center;
@@ -459,8 +707,8 @@ export default {
         white-space: nowrap;
         margin-left: 5px;
       }
-      .triangle2{
-        color:rgb(30,39,58);
+      .triangle2 {
+        color: rgb(30, 39, 58);
         font-size: 30px;
         position: absolute;
         left: 45%;
@@ -468,6 +716,7 @@ export default {
       }
     }
   }
+
   #container {
     width: 75%;
     height: 100%;

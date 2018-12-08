@@ -11,7 +11,7 @@ export default {
   name: "Home",
   data() {
     return {
-      isActive:1,
+      isActive:2,
     };
   },
   methods: {
@@ -21,7 +21,7 @@ export default {
       that.isActive = index;
       if (index == 1) {
         that.$router.push({
-          name: "Content",
+          name: "Search",
           params: {
           }
         });

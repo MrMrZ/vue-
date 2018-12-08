@@ -43,7 +43,7 @@ export default {
       isRouterAlive: true,
       isLogout: false,
       name: "", //当前登录客服
-      showSearch:1
+      showSearch: 1
     };
   },
   components: {
@@ -209,20 +209,11 @@ export default {
   },
   created() {
     var that = this;
-    //获取传入的参数
-    if (that.$route.params.name) {
-      that.name = that.$route.params.name;
-      console.log(that.name, "==============参数============");
-    }
-    //获取传入的参数
-    if (that.$route.params.showSearch) {
-       that.showSearch = that.$route.params.showSearch;
-       console.log( that.showSearch ,'======================2222');
-      }
   },
   mounted() {
     var that = this;
     var token = localStorage.getItem("token");
+
     if (!token) {
       that.$router.push({
         name: "Login",
@@ -235,11 +226,17 @@ export default {
       that.name = localStorage.getItem("name");
       console.log(localStorage.getItem("name"), "====================客服");
     }
-
-    console.log( document.documentElement.scrollHeight,'==================屏幕高度')
-
+    //获取传入的参数
+    if (that.$route.params.name) {
+      that.name = that.$route.params.name;
+      console.log(that.name, "==============参数============");
+    }
+    //获取传入的参数
+    if (that.$route.params.showSearch) {
+      that.showSearch = that.$route.params.showSearch;
+      console.log(that.showSearch, "======================2222");
+    }
   }
-
 };
 </script>
 
@@ -251,7 +248,7 @@ export default {
   background-color: rgb(30, 39, 58);
   display: flex;
   .nav {
-    width:10%;
+    width: 10%;
     // height: 100%;
     flex: auto;
   }
@@ -332,12 +329,11 @@ export default {
         margin-right: 121px;
         border: none;
         text-align: center;
-        color:#fff;
+        color: #fff;
       }
-       input::-webkit-input-placeholder{
-        color: rgb(32,112,231);
-         
-       }
+      input::-webkit-input-placeholder {
+        color: rgb(32, 112, 231);
+      }
 
       .search_icon {
         width: 54px;

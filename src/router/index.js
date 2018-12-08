@@ -8,6 +8,8 @@ import AddUser from '@/components/AddUser'
 import Details from '@/components/Details'
 import NewUser from '@/components/NewUser'
 import TheMap from '@/components/Map'
+import Search from '@/components/Search'
+
 
 
 Vue.use(Router)
@@ -54,6 +56,11 @@ export default new Router({
           path: 'map',
           name: 'Map',
           component:TheMap
+        },
+        {
+          path: 'search',
+          name: 'Search',
+          component:Search
         }
       ]
     },

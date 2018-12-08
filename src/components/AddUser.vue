@@ -1,5 +1,5 @@
 <template>
-   <div class="content">
+   <div class="add_content">
      
      <div class="title">创建新用户</div>
 
@@ -53,7 +53,7 @@ export default {
     cancel() {
       var that = this;
       that.$router.push({
-        name: "Content",
+        name: "Search",
         params: {
           // phoneNum: that.phoneNum
         }
@@ -156,7 +156,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="less" scoped>
-.content {
+.add_content {
   width: 743px;
   height: 542px;
   float: left;
