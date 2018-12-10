@@ -31,11 +31,11 @@ export default {
     search() {
       var that = this;
       if (!that.phoneNum) {
-        alert("请输入手机号");
+        that.$message("请输入手机号");
         return;
       }
       if (that.phoneNum.length != 11) {
-        alert("请输入正确手机号");
+        that.$message("请输入正确手机号");
         return;
       }
       var data = {
@@ -165,7 +165,7 @@ export default {
       float: right;
       input {
         width: 414px;
-        height: 60px;
+        height: 74px;
         border-radius: 26px;
         outline: none;
         font-size: 28px;
@@ -174,11 +174,15 @@ export default {
         border-radius: 6px;
         font-family: PingFang-SC-Bold;
         font-size: 30px;
-        float: right;
+        // float: right;
         margin-right: 121px;
         border: none;
         text-align: center;
         color: #fff;
+        position: absolute;
+        left: 50%;
+        margin-left: -207px;
+     
       }
       input::-webkit-input-placeholder {
         color: rgb(32, 112, 231);
@@ -190,8 +194,9 @@ export default {
         color: #fff;
         float: right;
         position: absolute;
-        top: 64px;
-        right: 126px;
+        top: 66px;
+        right:630px;
+        z-index:22;
       }
       .el-icon-search {
         font-size: 34px;

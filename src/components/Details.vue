@@ -1,5 +1,5 @@
 <template>
-   <div class="content2" >
+   <div class="content2"  >
      
         <!-- 用户信息 -->
         <div class="message">
@@ -45,13 +45,18 @@
                       <div class="lists" v-for="item1 in item.list" :key="item1.id">
                               <ul>
                                 <li>
-                                   <span class="phone_icon" v-if="item1.caty == 1"> <img src="../assets/call_in.png" alt=""></span>
-                                   <span class="phone_icon" v-else> <img src="../assets/call_out.png" alt=""></span>
+                                   <span v-if="item1.type == 1">
+                                      <span class="phone_icon" v-if="item1.caty == 1"> <img src="../assets/call_in.png" alt=""></span>
+                                      <span class="phone_icon" v-else-if="item1.caty == 2"> <img src="../assets/call_out.png" alt=""></span>
+                                   </span>
+                                   <span class="msg_icon" v-else-if="item1.type==2">  <img src="../assets/message@2x.png" alt=""></span>
                                     <span class="start_time">{{item1.start_time}}</span>
                                     <span class="line">|</span>
-                                    <span class="howlong">{{item1.talk_time}}分钟</span>
-                                    <span class="line">|</span>
-                                    <span class="des">{{item1.remarks}}</span>
+                                    <span class="howlong" v-show="item1.type==1">{{item1.talk_time}}分钟</span>
+                                    <span class="line" v-show="item1.type==1">|</span>
+                                    <span class="des w50" v-show="item1.type==1">{{item1.remarks}}</span>
+                                    <span class="des w50" v-show="item1.type==2">{{item1.name}}&nbsp;&nbsp;&nbsp;{{item1.eat_time}}</span>
+                                    <span class="el-icon-delete delete" v-show="item1.type==1" @click="toDelete(item1.id)"></span>
                                 </li>
                               </ul>
                       </div> 
@@ -173,7 +178,7 @@
            
            </div>
 
-            <div class="more">
+            <div class="more" v-show="false">
                   <div class="more_txt" >
                         <span>更多</span>
                           <i class="el-icon-caret-bottom  triangle" v-show="isShowOthers==2" @click="showMore(2)"></i>
@@ -414,6 +419,7 @@ export default {
       kids: "",
       areas: "",
       isShowOthers:1,
+        isRouterAlive: true,
     };
   },
   components: {},
@@ -560,7 +566,7 @@ export default {
               that.search();
               that.isEdit = false;
 
-              alert("修改成功");
+              that.$message("修改成功");
             }
 
             //控制台打印请求成功时返回的数据
@@ -650,15 +656,15 @@ export default {
       var that = this;
 
       if (!that.caty) {
-        alert("请选择记录类型");
+        that.$message("请选择记录类型");
         return;
       }
       if (!that.start_time) {
-        alert("请选择通话时间");
+        that.$message("请选择通话时间");
         return;
       }
       if (!that.talk_time) {
-        alert("请选择通话时长");
+        that.$message("请选择通话时长");
         return;
       }
 
@@ -707,8 +713,67 @@ export default {
               that.remarks = "";
               that.getRecord();
               that.isAddRecord = false;
+              that.$message("添加成功");
             }
 
+            //控制台打印请求成功时返回的数据
+            //bind(this)可以不用
+          }.bind(this)
+        )
+        .catch(
+          function(err) {
+            if (err.response) {
+              console.log(err.response, "=================失败");
+              //控制台打印错误返回的内容
+              if (err.response.status === 401) {
+                that.$router.push({
+                  name: "Login",
+                  params: {
+                    // info: that.info
+                  }
+                });
+              }
+            }
+            //bind(this)可以不用
+          }.bind(this)
+        );
+    },
+    toDelete(id){
+       var that = this;
+      var data = {};
+      data.id = id;
+      var token = localStorage.getItem("token");
+      if (!token) {
+        that.$router.push({
+          name: "Login",
+          params: {}
+        });
+        return;
+      }
+      console.log(
+        data,
+        "===================请求参数",
+        token,
+        "==========token"
+      );
+      that.axios
+        .delete("https://power.anlly.net/fuyan/v1/service/callrecord",
+         {
+           data:data,
+            headers: {
+            // "Access-Control-Allow-Origin": "*",
+            // "Content-Type": "application/json; charset=utf-8"
+            token: token
+          } 
+        })
+        .then(
+          function(res) {
+            console.log(res.data, "=================请求成功");
+            if (res.data.status == "success") {
+               that.getRecord();
+              // that.router.go(0);
+               that.$message("删除成功");
+            }
             //控制台打印请求成功时返回的数据
             //bind(this)可以不用
           }.bind(this)
@@ -999,6 +1064,13 @@ export default {
               margin-left: 20px;
               float: left;
             }
+            .w50{
+              display: inline-block;
+              width: 70%;
+               overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+            }
             .line {
               font-size: 36px;
               color: rgb(117, 149, 217);
@@ -1016,6 +1088,24 @@ export default {
                 width: 46px;
               }
             }
+            .msg_icon{
+               display: inline-block;
+              width: 46px;
+              height: 100%;
+              box-sizing: border-box;
+              padding-top: 15px;
+              float: left;
+              color:rgb(117, 149, 217);
+              margin-top: 4px;
+             
+            }
+             .delete{
+                font-size: 40px;
+                color:#fff;
+                float:right;
+                margin-top: 18px;
+                margin-right: 10px;
+              }
             .start_time {
               /deep/.el-input--suffix .el-input__inner {
                 color: #fff;

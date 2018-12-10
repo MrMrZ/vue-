@@ -63,11 +63,11 @@ export default {
     search() {
       var that = this;
       if (!that.phoneNum) {
-        alert("请输入手机号");
+        that.$message("请输入手机号");
         return;
       }
       if (that.phoneNum.length != 11) {
-        alert("请输入正确手机号");
+        that.$message("请输入正确手机号");
         return;
       }
       var data = {
