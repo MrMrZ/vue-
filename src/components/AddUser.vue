@@ -9,7 +9,7 @@
                     <div class="left">手机号</div>
                     <input  class="right" type="text"  v-model="phoneNum">
                 </div>
-                <div class="_input">
+                <div class="_input  " style="margin-top:40px">
                     <div class="left">称&nbsp;&nbsp;&nbsp;&nbsp;呼</div>
                     <div  class="input_name" >
                       <input type="text" v-model="username">
@@ -23,7 +23,7 @@
               
          </div>
          <div class="con_r">
-             <div class="_input h160">
+             <div class="_input mt20">
                         <div class="left">备&nbsp;&nbsp;&nbsp;&nbsp;注</div>
                           <textarea  class="_textarea" type="text"  v-model="textarea"></textarea>
                            <div class="more" >
@@ -239,10 +239,18 @@ export default {
   components: {},
 
   methods: {
+    isPoneAvailable(phoneNum) {
+      var myreg = /^[1][3,4,5,7,8][0-9]{9}$/;
+      if (!myreg.test(phoneNum)) {
+        return false;
+      } else {
+        return true;
+      }
+    },
     cancel() {
       var that = this;
       that.$router.push({
-        name: "Search",
+        name: "Content",
         params: {
           // phoneNum: that.phoneNum
         }
@@ -254,14 +262,32 @@ export default {
       var that = this;
 
       if (!that.username) {
-        that.$message("请输入称呼");
+        that.$message({
+          message: "请输入称呼",
+          type: "warning",
+          center: true
+        });
         return;
       }
 
       if (that.phoneNum.length != 11) {
-        that.$message("请输入正确手机号");
+        that.$message({
+          message: "请输入正确手机号",
+          type: "warning",
+          center: true
+        });
         return;
       }
+
+      if (!that.isPoneAvailable(that.phoneNum)) {
+        that.$message({
+          message: "请输入正确手机号码",
+          type: "warning",
+          center: true
+        });
+        return;
+      }
+
       var remarks = that.textarea;
 
       if (that.cars) {
@@ -336,6 +362,13 @@ export default {
         "==========token"
       );
 
+      var loading = that.$loading({
+        lock: true,
+        text: "Loading",
+        spinner: "el-icon-loading",
+        background: "rgba(0, 0, 0, 0.7)"
+      });
+
       that.axios
         .post(
           "https://power.anlly.net/fuyan/v1/service/phone",
@@ -352,14 +385,31 @@ export default {
           function(res) {
             console.log(res.data, "=================请求成功");
             if (res.data.status == "success") {
-              that.$message('提交成功');
+                
+              loading.close();
+
+              that.$message({
+                message: "提交成功",
+                type: "success",
+                center: true
+              });
+
+
               localStorage.setItem("phone", that.phoneNum);
               that.$router.push({
                 name: "Details",
                 params: {
                   // info: that.info
+                  id:res.data.id
                 }
               });
+            } else if (res.data.status == "error") {
+                  loading.close();
+                   that.$message({
+                    message: '网络错误',
+                    type: 'error',
+                     center:true,
+                  });
             }
 
             //控制台打印请求成功时返回的数据
@@ -370,6 +420,12 @@ export default {
           function(err) {
             if (err.response) {
               console.log(err.response, "=================失败");
+               loading.close();
+                that.$message({
+                    message: '登录超时，请重新登录',
+                    type: 'error',
+                     center:true,
+                });
               if (err.response.status === 401) {
                 that.$router.push({
                   name: "Login",
@@ -405,8 +461,7 @@ export default {
   box-sizing: border-box;
   background-color: rgb(30, 39, 58);
   margin-left: 121px;
-  margin-top: 100px;
-
+  margin-top: 28px;
   .add_con {
     width: 100%;
     height: 100%;
@@ -427,6 +482,7 @@ export default {
       padding-left: 57px;
       // padding-top: 67px;
       background-color: rgb(36, 50, 80);
+
       ._textarea {
         width: 483px;
         height: 112px;
@@ -439,12 +495,12 @@ export default {
         color: #fff;
         box-sizing: border-box;
         padding: 10px;
-        margin-top: 32px;
+        margin-top: 14px;
         outline: none;
       }
       .more_list {
         width: 100%;
-        margin-top: 41px;
+        margin-top: 16px;
         ul {
           width: 100%;
           height: 100%;
@@ -498,12 +554,12 @@ export default {
     font-size: 60px;
     color: #fff;
   }
-
+ 
   ._input {
     width: 100%;
     height: 80px;
     clear: both;
-    margin-top: 41px;
+    margin-top: 88px;
     .left {
       line-height: 80px;
       float: left;
@@ -580,12 +636,14 @@ export default {
       outline: none;
     }
   }
-
+.mt20{
+      margin-top: 46px;
+}
   .btn {
     width: 740px;
     height: 80px;
     clear: both;
-    margin: 65px auto;
+    margin: 40px auto;
     cursor: pointer;
     div {
       width: 326px;

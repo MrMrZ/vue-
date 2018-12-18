@@ -1,26 +1,30 @@
 <template>
-   <div class="content2"  >
+   <div class="content2"   v-show="isRouterAlive">
      
+
         <!-- 用户信息 -->
         <div class="message">
-              <div class="phone">{{info.phone}}</div>
+              <div class="phone">{{showInfo.phone}}</div>
               <div class="details">
                    <div class="msg_con">
                        <div class="_input">
                           <div class="left">称&nbsp;&nbsp;&nbsp;呼：</div>
                           <div  class="input_name" >
-                            <input type="text" v-model="info.realname" :class="{'active':isEdit}" :readonly="!isEdit" >
+                            <input type="text" v-model="showInfo.realname" :class="{'active':isEdit}" :readonly="!isEdit" >
                           </div>
                           <div class="sex_con">
-                              <el-radio class="sex" v-model="info.sex" label="1" :disabled="!isEdit" style="font-size:40px">先生</el-radio>
-                              <el-radio class="sex" v-model="info.sex" label="2" :disabled="!isEdit">女士</el-radio>
+                              <el-radio class="sex" v-model="showInfo.sex" label="1" :disabled="!isEdit" style="font-size:40px">先生</el-radio>
+                              <el-radio class="sex" v-model="showInfo.sex" label="2" :disabled="!isEdit">女士</el-radio>
                           </div>
                         </div>
 
-                         <div class="_input">
-                          <div class="left">备&nbsp;&nbsp;&nbsp;注：</div>
+                         <div class="_input w1000">
+                          <div class="left lh68">备&nbsp;&nbsp;&nbsp;注：</div>
                           <div  class="input_name w200" >
-                            <input type="text" :class="{'active':isEdit}" v-model="info.remarks"  :readonly="!isEdit" >
+                            <div class="show_remarks" v-if="!isEdit"> {{showInfo.remarks}}</div>
+                            <textarea type="text" class="active" v-model="showInfo.remarks"  :readonly="!isEdit"  v-else></textarea>
+                           
+                            <!-- <textarea type="text" :class="{'active':isEdit}" v-model="showInfo.remarks"  :readonly="!isEdit" ></textarea> -->
                           </div>
                         </div>
                    </div>
@@ -42,21 +46,27 @@
               <div class="record_list" :class="{'pgtb':list.length>0}" v-show="list.length>0">
                 <div  v-for="item in list" :key="item.id">
                       <div class="time">{{item.day}}</div>
-                      <div class="lists" v-for="item1 in item.list" :key="item1.id">
+                      <div class="lists" v-for="(item1) in item.list" :key="item1.id">
                               <ul>
-                                <li>
-                                   <span v-if="item1.type == 1">
-                                      <span class="phone_icon" v-if="item1.caty == 1"> <img src="../assets/call_in.png" alt=""></span>
-                                      <span class="phone_icon" v-else-if="item1.caty == 2"> <img src="../assets/call_out.png" alt=""></span>
-                                   </span>
-                                   <span class="msg_icon" v-else-if="item1.type==2">  <img src="../assets/message@2x.png" alt=""></span>
-                                    <span class="start_time">{{item1.start_time}}</span>
-                                    <span class="line">|</span>
-                                    <span class="howlong" v-show="item1.type==1">{{item1.talk_time}}分钟</span>
-                                    <span class="line" v-show="item1.type==1">|</span>
-                                    <span class="des w50" v-show="item1.type==1">{{item1.remarks}}</span>
-                                    <span class="des w50" v-show="item1.type==2">{{item1.name}}&nbsp;&nbsp;&nbsp;{{item1.eat_time}}</span>
-                                    <span class="el-icon-delete delete" v-show="item1.type==1" @click="toDelete(item1.id)"></span>
+                                <li class="_record">
+                                   <div v-if="item1.type == 1">
+                                      <div class="phone_icon" v-if="item1.caty == 1"> <img src="../assets/call_in.png" alt=""></div>
+                                      <div class="phone_icon" v-else-if="item1.caty == 2"> <img src="../assets/call_out.png" alt=""></div>
+                                   </div>
+                                   <div class="msg_icon" v-else-if="item1.type==2">  <img src="../assets/message@2x.png" alt=""></div>
+                                    <div class="start_time">{{item1.start_time}}</div>
+                                    <div class="line">|</div>
+                                    <div class="howlong" v-show="item1.type==1">{{item1.talk_time}}分钟</div>
+                                    <div class="line" v-show="item1.type==1">|</div>
+                                    <textarea class="des w50  modify_txt"   v-if="isModify === item1.id"  v-show="item1.type==1" v-model="item1.remarks"></textarea>
+                                    <div class="des w50 "    v-else  v-show="item1.type==1"  > {{item1.remarks}}</div>
+
+                                    <!-- <textarea class="des w50 "  :disabled="isModify !== item1.id" :class="{'modify_txt':isModify === item1.id}" v-show="item1.type==1" v-model="item1.remarks"></textarea> -->
+                                    <div class="des w50" v-show="item1.type==2">{{item1.name}}&nbsp;&nbsp;&nbsp;{{item1.eat_time}}</div>
+                                    <div class="el-icon-edit modify"  v-show="item1.type==1 &&isModify!=item1.id " @click="AMend(item1.id)" ></div>
+                                    <div class="el-icon-check sureModify" v-show="item1.type==1 && isModify === item1.id" @click="toAmend(item1.id,item1.remarks)" ></div>
+
+
                                 </li>
                               </ul>
                       </div> 
@@ -65,11 +75,8 @@
               </div>
         </div>
 
-       
-    
-
-     <div class="mask" v-show="isAddRecord" >
-        <div class="new_record">
+  
+       <div class="new_record">
           <div class="title">新增记录</div>
           <div class="time_msg">
             <div class="left">
@@ -97,71 +104,14 @@
                     <el-date-picker class="select_time"
                       v-model="start_time"
                       type="datetime"
-                      value-format="timestamp"
+                      format="yyyy-MM-dd HH:mm"
                       placeholder=""
                       default-time	
                       default-value	>
                     </el-date-picker>
                 </div>
                 <div class="long">
-                     <input class="minute"  type="text" v-model="talk_time">
-                     分钟
-                </div>
-              </div>
-            </div>
-          </div>
-
-
-           <div class="remark_con">
-             <div class="add_remark">备注</div>
-              <div class="add_txt">
-                <input type="text" v-model="remarks" >
-            </div>
-
-           </div>
-            <div class="button_con">
-                 <div class="sure" @click="addRecord" >提交</div>
-                 <div class="no"  @click="isAddRecord=false">取消</div>
-            </div>
-
-        </div>
-     </div>
-   <div class="new_record">
-          <div class="title">新增记录</div>
-          <div class="time_msg">
-            <div class="left">
-                 <div class="type">记录类型</div>
-                 <div class="_select">
-                   <el-select v-model="caty" placeholder="请选择" >
-                      <el-option
-                        v-for="item in options"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value">
-                      </el-option>
-                    </el-select>
-                 </div>
-                  
-                                  
-            </div>
-            <div class="right">
-              <div class="time_des">
-                   <span>通话时间</span>
-                   <span>通话时长</span>
-              </div>
-              <div class="_time_det">
-                <div class="date">
-                    <el-date-picker class="select_time"
-                      v-model="start_time"
-                      type="datetime"
-                      value-format="timestamp"
-                      placeholder=""
-                      default-time	
-                      default-value	>
-                    </el-date-picker>
-                </div>
-                <div class="long">
-                     <input class="minute"  type="text" v-model="talk_time">
+                     <input class="minute"  type="number" v-model="talk_time" min='1'>
                      分钟
                 </div>
               </div>
@@ -257,15 +207,15 @@
                  <div class="sure" @click="addRecord" >新增记录</div>
                  <div class="no"  @click="clearInput" >取消</div>
             </div>
-
         </div>
-     <!-- 添加记录弹框 --> 
+        <!-- 添加记录弹框 --> 
       </div>
 
-  
 </template>
 
 <script>
+import Search from "./Search";
+
 export default {
   name: "Home",
   props: ["msg"],
@@ -283,12 +233,16 @@ export default {
       username: "",
       id: "", //当前用户id
       info: {
-        id: "",
-        phone: "",
-        realname: "",
-        remarks: "",
-        sex: "1"
+        //存储信息的
+        // id: "",
+        // phone: "",
+        // realname: "",
+        // remarks: "",
+        // sex: "1",
       },
+
+      showInfo: {}, //展示用户信息的
+
       list: [],
       isEdit: false,
       isAddRecord: false,
@@ -418,32 +372,38 @@ export default {
       years: "",
       kids: "",
       areas: "",
-      isShowOthers:1,
-        isRouterAlive: true,
+      isShowOthers: 1,
+      isRouterAlive: true,
+
+      isModify: -1
     };
   },
-  components: {},
+  components: {
+    Search
+  },
 
   methods: {
-
-      // 取消，清空输入框
-      clearInput(){
-        var that = this;
-        that.caty= '';
-        that.talk_time = "";
-        that.start_time = "";
-        that.remarks = "";
-      },
-      // 是否展示更多
-      showMore(index){
-          var that = this;
-          if(index == 2){
-             that.isShowOthers = 1;
-          }else{
-             that.isShowOthers = 2;
-          }
-
-      },
+    AMend(index) {
+      var that = this;
+      that.isModify = index;
+    },
+    // 取消，清空输入框
+    clearInput() {
+      var that = this;
+      that.caty = "";
+      that.talk_time = "";
+      that.start_time = "";
+      that.remarks = "";
+    },
+    // 是否展示更多
+    showMore(index) {
+      var that = this;
+      if (index == 2) {
+        that.isShowOthers = 1;
+      } else {
+        that.isShowOthers = 2;
+      }
+    },
 
     timestampToTime(timestamp) {
       var date = new Date(timestamp * 1000); //时间戳为10位需*1000，时间戳为13位的话不需乘1000
@@ -463,6 +423,10 @@ export default {
       if (index == 1) {
         that.isEdit = true;
       } else {
+        console.log(that.info, "==============修改===========", that.showInfo);
+        that.showInfo = JSON.parse(that.info);
+        // that.showInfo =  that.info;
+
         that.isEdit = false;
       }
     },
@@ -471,7 +435,7 @@ export default {
       var that = this;
 
       var data = {
-        phone: that.info.phone
+        phone: that.showInfo.phone
       };
 
       var token = localStorage.getItem("token");
@@ -489,6 +453,14 @@ export default {
         token,
         "==========token"
       );
+
+      var loading = that.$loading({
+        lock: true,
+        text: "Loading",
+        spinner: "el-icon-loading",
+        background: "rgba(0, 0, 0, 0.7)"
+      });
+
       that.axios
         .get(
           "https://power.anlly.net/fuyan/v1/service/phone",
@@ -508,7 +480,22 @@ export default {
           function(res) {
             console.log(res.data, "=================请求成功");
             if (res.data.status == "success") {
-              that.info = res.data.info;
+              that.showInfo = res.data.info;
+              that.info = JSON.stringify(res.data.info);
+
+              console.log(
+                that.info,
+                "=========================",
+                that.showInfo
+              );
+              loading.close();
+            } else if (res.data.status == "error") {
+              loading.close();
+              that.$message({
+                message: "网络错误",
+                type: "error",
+                center: true
+              });
             }
             //控制台打印请求成功时返回的数据
             //bind(this)可以不用
@@ -517,6 +504,12 @@ export default {
         .catch(
           function(err) {
             if (err.response) {
+              loading.close();
+              that.$message({
+                message: "登录超时，请重新登录",
+                type: "error",
+                center: true
+              });
               console.log(err.response, "=================失败");
               //控制台打印错误返回的内容
               if (err.response.status === 401) {
@@ -533,10 +526,13 @@ export default {
         );
     },
 
-    // 修改用户信息
-    modify() {
+    // 修改记录
+    toAmend(id, remarks) {
       var that = this;
-      var data = that.info;
+      var data = {};
+      data.id = id;
+      data.remarks = remarks;
+
       var token = localStorage.getItem("token");
       if (!token) {
         that.$router.push({
@@ -551,6 +547,97 @@ export default {
         token,
         "==========token"
       );
+
+      var loading = that.$loading({
+        lock: true,
+        text: "Loading",
+        spinner: "el-icon-loading",
+        background: "rgba(0, 0, 0, 0.7)"
+      });
+
+      that.axios
+        .put("https://power.anlly.net/fuyan/v1/service/callrecord", data, {
+          headers: {
+            // "Access-Control-Allow-Origin": "*",
+            // "Content-Type": "application/json; charset=utf-8"
+            token: token
+          }
+        })
+        .then(
+          function(res) {
+            console.log(res.data, "=================请求成功");
+            if (res.data.status == "success") {
+              loading.close();
+              that.getRecord();
+              that.isModify = -1;
+              that.$message({
+                message: "修改成功",
+                type: "success",
+                center: true
+              });
+            } else if (res.data.status == "error") {
+              loading.close();
+              that.$message({
+                message: "网络错误",
+                type: "error",
+                center: true
+              });
+            }
+
+            //控制台打印请求成功时返回的数据
+            //bind(this)可以不用
+          }.bind(this)
+        )
+        .catch(
+          function(err) {
+            if (err.response) {
+              console.log(err.response, "=================失败");
+              loading.close();
+              that.$message({
+                message: "登录超时，请重新登录",
+                type: "error",
+                center: true
+              });
+              //控制台打印错误返回的内容
+              if (err.response.status === 401) {
+                that.$router.push({
+                  name: "Login",
+                  params: {
+                    // info: that.info
+                  }
+                });
+              }
+            }
+            //bind(this)可以不用
+          }.bind(this)
+        );
+    },
+    // 修改用户信息
+    modify() {
+      var that = this;
+      var data = that.showInfo;
+      var token = localStorage.getItem("token");
+      if (!token) {
+        that.$router.push({
+          name: "Login",
+          params: {}
+        });
+        return;
+      }
+      console.log(
+        data,
+        "===================请求参数",
+        token,
+        "==========token"
+      );
+
+      var loading = that.$loading({
+        lock: true,
+        text: "Loading",
+        spinner: "el-icon-loading",
+        background: "rgba(0, 0, 0, 0.7)"
+      });
+
       that.axios
         .put("https://power.anlly.net/fuyan/v1/service/phone", data, {
           headers: {
@@ -563,10 +650,21 @@ export default {
           function(res) {
             console.log(res.data, "=================请求成功");
             if (res.data.status == "success") {
+              loading.close();
               that.search();
               that.isEdit = false;
-
-              that.$message("修改成功");
+              that.$message({
+                message: "修改成功",
+                type: "success",
+                center: true
+              });
+            } else if (res.data.status == "error") {
+              loading.close();
+              that.$message({
+                message: "网络错误",
+                type: "error",
+                center: true
+              });
             }
 
             //控制台打印请求成功时返回的数据
@@ -577,6 +675,12 @@ export default {
           function(err) {
             if (err.response) {
               console.log(err.response, "=================失败");
+              loading.close();
+              that.$message({
+                message: "登录超时，请重新登录",
+                type: "error",
+                center: true
+              });
               //控制台打印错误返回的内容
               if (err.response.status === 401) {
                 that.$router.push({
@@ -595,7 +699,7 @@ export default {
     getRecord() {
       var that = this;
       var data = {
-        phone: that.info.phone
+        phone: that.showInfo.phone
       };
       var token = localStorage.getItem("token");
       if (!token) {
@@ -611,6 +715,13 @@ export default {
         token,
         "==========token"
       );
+
+      var loading = that.$loading({
+        lock: true,
+        text: "Loading",
+        spinner: "el-icon-loading",
+        background: "rgba(0, 0, 0, 0.7)"
+      });
       that.axios
         .get("https://power.anlly.net/fuyan/v1/service/callrecord", {
           params: data,
@@ -622,10 +733,18 @@ export default {
           function(res) {
             console.log(res.data, "=================获取记录成功");
             if (res.data.status == "success") {
+              loading.close();
               if (res.data.lists) {
                 that.list = res.data.lists;
                 console.log(that.list.length, "=================长度");
               }
+            } else if (res.data.status == "error") {
+              loading.close();
+              that.$message({
+                message: "网络错误",
+                type: "error",
+                center: true
+              });
             }
 
             //控制台打印请求成功时返回的数据
@@ -635,6 +754,12 @@ export default {
         .catch(
           function(err) {
             if (err.response) {
+              loading.close();
+              that.$message({
+                message: "登录超时，请重新登录",
+                type: "error",
+                center: true
+              });
               console.log(err.response, "=================失败");
               //控制台打印错误返回的内容
               if (err.response.status === 401) {
@@ -656,25 +781,67 @@ export default {
       var that = this;
 
       if (!that.caty) {
-        that.$message("请选择记录类型");
+        that.$message({
+          message: "请选择记录类型",
+          type: "warning",
+          center: true
+        });
         return;
       }
       if (!that.start_time) {
-        that.$message("请选择通话时间");
+        that.$message({
+          message: "请选择通话时间",
+          type: "warning",
+          center: true
+        });
         return;
       }
       if (!that.talk_time) {
-        that.$message("请选择通话时长");
+        that.$message({
+          message: "请选择通话时长",
+          type: "warning",
+          center: true
+        });
         return;
       }
 
+      if (that.talk_time <= 0) {
+        that.$message({
+          message: "通话时长必须大于0",
+          type: "warning",
+          center: true
+        });
+        return;
+      }
+
+      var current = new Date().getTime();
+      console.log(current, "=================", that.start_time);
+      if (that.start_time > current) {
+        that.$message({
+          message: "通话时间必须小于当前时间",
+          type: "warning",
+          center: true
+        });
+        return;
+      }
+
+      // if (that.start_time.length != 13) {
+      //   that.start_time = parseInt(new Date().getTime() / 1000);
+      // }
+
+      console.log(
+        new Date(that.start_time).getTime(),
+        "=================================shijianshijaihhhhhhh"
+      );
+      var time = parseInt(new Date(that.start_time).getTime() / 1000);
       var data = {
-        phone: that.info.phone,
+        phone: that.showInfo.phone,
         caty: that.caty,
         talk_time: that.talk_time,
-        start_time: that.start_time / 1000,
+        start_time: time,
         remarks: that.remarks
       };
+
       var token = localStorage.getItem("token");
 
       if (!token) {
@@ -691,6 +858,12 @@ export default {
         "==========token"
       );
 
+      var loading = that.$loading({
+        lock: true,
+        text: "Loading",
+        spinner: "el-icon-loading",
+        background: "rgba(0, 0, 0, 0.7)"
+      });
       that.axios
         .post(
           "https://power.anlly.net/fuyan/v1/service/callrecord",
@@ -707,13 +880,25 @@ export default {
           function(res) {
             console.log(res.data, "=================添加记录成功");
             if (res.data.status == "success") {
+              loading.close();
               that.caty = "";
               that.talk_time = "";
               that.start_time = "";
               that.remarks = "";
               that.getRecord();
               that.isAddRecord = false;
-              that.$message("添加成功");
+              that.$message({
+                message: "添加成功",
+                type: "success",
+                center: true
+              });
+            } else if (res.data.status == "error") {
+              loading.close();
+              that.$message({
+                message: "网络错误",
+                type: "error",
+                center: true
+              });
             }
 
             //控制台打印请求成功时返回的数据
@@ -723,6 +908,12 @@ export default {
         .catch(
           function(err) {
             if (err.response) {
+              loading.close();
+              that.$message({
+                message: "登录超时，请重新登录",
+                type: "error",
+                center: true
+              });
               console.log(err.response, "=================失败");
               //控制台打印错误返回的内容
               if (err.response.status === 401) {
@@ -738,8 +929,8 @@ export default {
           }.bind(this)
         );
     },
-    toDelete(id){
-       var that = this;
+    toDelete(id) {
+      var that = this;
       var data = {};
       data.id = id;
       var token = localStorage.getItem("token");
@@ -756,23 +947,42 @@ export default {
         token,
         "==========token"
       );
+
+      var loading = that.$loading({
+        lock: true,
+        text: "Loading",
+        spinner: "el-icon-loading",
+        background: "rgba(0, 0, 0, 0.7)"
+      });
+
       that.axios
-        .delete("https://power.anlly.net/fuyan/v1/service/callrecord",
-         {
-           data:data,
-            headers: {
+        .delete("https://power.anlly.net/fuyan/v1/service/callrecord", {
+          data: data,
+          headers: {
             // "Access-Control-Allow-Origin": "*",
             // "Content-Type": "application/json; charset=utf-8"
             token: token
-          } 
+          }
         })
         .then(
           function(res) {
             console.log(res.data, "=================请求成功");
             if (res.data.status == "success") {
-               that.getRecord();
+              loading.close();
+              that.getRecord();
               // that.router.go(0);
-               that.$message("删除成功");
+              that.$message({
+                message: "删除成功",
+                type: "success",
+                center: true
+              });
+            } else if (res.data.status == "error") {
+              loading.close();
+              that.$message({
+                message: "网络错误",
+                type: "error",
+                center: true
+              });
             }
             //控制台打印请求成功时返回的数据
             //bind(this)可以不用
@@ -781,6 +991,12 @@ export default {
         .catch(
           function(err) {
             if (err.response) {
+              loading.close();
+              that.$message({
+                message: "登录超时，请重新登录",
+                type: "error",
+                center: true
+              });
               console.log(err.response, "=================失败");
               //控制台打印错误返回的内容
               if (err.response.status === 401) {
@@ -799,21 +1015,34 @@ export default {
   },
   mounted() {
     var that = this;
-  },
-  created() {
-    var that = this;
     //获取传入的参数
     if (that.$route.params.info) {
       that.info = that.$route.params.info;
       console.log(that.info, "==============参数============");
+      that.showInfo = that.$route.params.info;
     }
 
     if (localStorage.getItem("phone")) {
       var phone = localStorage.getItem("phone");
-      that.info.phone = phone;
+      that.showInfo.phone = phone;
       that.search();
       that.getRecord();
     }
+  },
+  created() {
+    // var that = this;
+    // //获取传入的参数
+    // if (that.$route.params.info) {
+    //   that.info = that.$route.params.info;
+    //   console.log(that.info, "==============参数============");
+    //   that.showInfo = that.$route.params.info;
+    // }
+    // if (localStorage.getItem("phone")) {
+    //   var phone = localStorage.getItem("phone");
+    //   that.showInfo.phone = phone;
+    //   that.search();
+    //   that.getRecord();
+    // }
   }
 };
 </script>
@@ -822,15 +1051,20 @@ export default {
 <style lang="less"  >
 .content2 {
   width: 100%;
+  // height: 800px;
+  height: 100%;
   float: left;
   box-sizing: border-box;
   background-color: rgb(30, 39, 58);
   padding-bottom: 50px;
+  overflow-y: scroll;
+  // position: absolute;
   .message {
-    width: 1470px;
-    height: 293px;
+    width: 90%;
+    // height: 293px;
     margin-left: 101px;
-    margin-top: 36px;
+    margin-top: 20px;
+
     .phone {
       font-family: PingFang-SC-Bold;
       font-size: 60px;
@@ -842,19 +1076,22 @@ export default {
       clear: both;
       background-color: rgb(43, 55, 81);
       border-radius: 20px;
-      box-sizing: border-box;
+      // box-sizing: border-box;
       padding-left: 48px;
       padding-top: 10px;
       margin: 20px;
+
       .msg_con {
         width: 70%;
         height: 100%;
         float: left;
         ._input {
           width: 800px;
+          height: 60px;
           clear: both;
           margin-top: 20px;
-          overflow: hidden;
+          // overflow: hidden;
+          clear: both;
           .left {
             line-height: 60px;
             float: left;
@@ -862,6 +1099,10 @@ export default {
             font-size: 44px;
             color: #fff;
           }
+          .lh68 {
+            line-height: 74px;
+          }
+
           .right {
             height: 100%;
             float: left;
@@ -877,6 +1118,7 @@ export default {
             height: 100%;
             float: left;
             outline: none;
+
             input {
               width: 100%;
               height: 100%;
@@ -887,6 +1129,14 @@ export default {
               font-size: 40px;
               color: #fff;
               // margin-top: 4px;
+              box-sizing: border-box;
+              padding-left: 10px;
+            }
+            .show_remarks {
+              font-family: PingFang-SC-Medium;
+              font-size: 30px;
+              color: #fff;
+              margin-top: 18px; 
             }
             .active {
               border-radius: 10px;
@@ -895,27 +1145,25 @@ export default {
             }
           }
           .w200 {
-            width: 70%;
-            input {
+            width: 83%;
+            height: 80px;
+            font-size: 30px;
+            textarea {
+              width: 100%;
               height: 80px;
-
-              // padding-top: 9px;
+              padding-top: -20px;
               padding-bottom: 8px;
               font-size: 30px;
+              background-color: rgb(43, 55, 81);
+              color: #fff;
+              resize: none;
+              border: none;
+              box-sizing: border-box;
+              padding: 5px;
+              outline: none;
             }
           }
-          // .w200 {
-          //   width: 70%;
-          //   // height: 100%;
-          //   font-size: 40px;
-          //   // line-height: 60px;
-          //   input {
-          //     font-size: 30px;
-          //     //  line-height: 60px;
-          //     //  height: 100%;
 
-          //   }
-          // }
           .edit {
             width: 24px;
             height: 24px;
@@ -955,13 +1203,16 @@ export default {
             outline: none;
           }
         }
+        .w1000 {
+          width: 1100px;
+        }
       }
       .btn_con {
         width: 28%;
         height: 100%;
         float: right;
         box-sizing: border-box;
-        padding-top: 20px;
+        padding-top: 40px;
         padding-left: 40px;
         div {
           width: 205px;
@@ -986,7 +1237,8 @@ export default {
   }
 
   .record_con {
-    width: 1470px;
+    width: 90%;
+    // width: 1470px;
     // height: 293px;
     margin-left: 101px;
     margin-top: 36px;
@@ -1020,13 +1272,14 @@ export default {
 
     .record_list {
       width: 100%;
-      height: 560px;
+      // height: 560px;
       // height:293px ;
       background-color: rgb(43, 55, 81);
       border-radius: 20px;
       padding-left: 32px;
+      padding-bottom: 32px;
       overflow: hidden;
-      overflow-y: scroll;
+      // overflow-y: scroll;
 
       margin-top: 20px;
       .pdtb {
@@ -1047,14 +1300,19 @@ export default {
           padding-left: 0;
           li {
             width: 98%;
-            height: 80px;
-            line-height: 80px;
+            // height: 80px;
+            // line-height: 80px;
             background-color: rgb(61, 75, 108);
             border-radius: 10px;
             clear: both;
             margin-top: 10px;
             box-sizing: border-box;
+            padding-top: 12px;
+            padding-bottom: 12px;
             padding-left: 20px;
+
+            display: flex;
+            justify-content: flex-start;
             .start_time,
             .howlong,
             .des {
@@ -1063,13 +1321,36 @@ export default {
               color: #fff;
               margin-left: 20px;
               float: left;
+              // line-height: 80px;
             }
-            .w50{
+            textarea {
+              background-color: rgb(61, 75, 108);
+              border: none;
+              outline: none;
+              resize: none;
+            }
+            .w50 {
               display: inline-block;
               width: 70%;
-               overflow: hidden;
-              text-overflow: ellipsis;
-              white-space: nowrap;
+              min-height: 50px;
+              // overflow: hidden;
+              // text-overflow: ellipsis;
+              // white-space: nowrap;
+            }
+
+            .modify_txt {
+              display: inline-block;
+              width: 70%;
+              // height: 100px;
+              // overflow: hidden;
+              // text-overflow: ellipsis;
+              // white-space: nowrap;
+              // border: 1px solid #000;
+              outline: none;
+              background-color: rgb(48, 63, 95);
+              border: 1px solid rgb(117, 136, 177);
+              border-radius: 6px;
+              padding-left: 10px;
             }
             .line {
               font-size: 36px;
@@ -1082,33 +1363,43 @@ export default {
               width: 46px;
               height: 100%;
               box-sizing: border-box;
-              padding-top: 15px;
+              padding-top: 4px;
               float: left;
               img {
                 width: 46px;
               }
             }
-            .msg_icon{
-               display: inline-block;
+            .msg_icon {
+              display: inline-block;
               width: 46px;
               height: 100%;
               box-sizing: border-box;
-              padding-top: 15px;
-              float: left;
-              color:rgb(117, 149, 217);
-              margin-top: 4px;
-             
-            }
-             .delete{
-                font-size: 40px;
-                color:#fff;
-                float:right;
-                margin-top: 18px;
-                margin-right: 10px;
+              // padding-top: 15px;
+              color: rgb(117, 149, 217);
+              margin-top: 7px;
+              img {
+                width: 46px;
               }
+            }
+            .modify {
+              font-size: 40px;
+              color: #fff;
+              float: right;
+              margin-top: 4px;
+              margin-left: 10px;
+            }
+            .sureModify {
+              // line-height:80px ;
+              font-family: PingFang-SC-Medium;
+              font-size: 40px;
+              margin-top: 4px;
+              color: #fff;
+              margin-left: 10px;
+            }
             .start_time {
               /deep/.el-input--suffix .el-input__inner {
                 color: #fff;
+                border: 1px solid red;
               }
             }
           }
@@ -1242,13 +1533,19 @@ export default {
               position: absolute;
               top: 0px;
               .el-input__inner {
+                width: 220px;
                 background-color: rgb(35, 46, 69);
                 border: 1px solid rgb(117, 136, 177);
               }
             }
             /deep/.el-input__inner {
               color: #fff;
-              font-size: 16px;
+              font-size: 18px;
+            }
+            /deep/.el-input__icon {
+              font-size: 20px;
+              margin-top: 0px;
+              margin-right: 4px;
             }
           }
           .long {
@@ -1304,6 +1601,7 @@ export default {
           border: none;
           box-sizing: border-box;
           padding-left: 18px;
+          padding-top: 4px;
         }
       }
     }

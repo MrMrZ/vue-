@@ -6,17 +6,18 @@
       </div>
       <!-- 右边内容 -->
       <div class="box">
-        <div class="user">
-            <i class="el-icon-caret-bottom logout" v-show="!isLogout" @click="isLogout=true"></i>
+        <div class="user" >
+            <div  class="user_box" ref="user">
+               <i class="el-icon-caret-bottom logout" v-show="!isLogout" @click="isLogout=true"></i>
             <i class="el-icon-caret-top logout" v-show="isLogout"  @click="isLogout=false"></i>
             <span class="username">{{name}}</span>
              <img src="../assets/mine.png" alt="" class="mine" >
             <div class="quit" v-show="isLogout" @click="logout">注销</div>
+            </div>
         </div>
-        <div class="search" v-show="false">
-            <i class="el-icon-search search_icon" @click="toSearch"></i>
-            <input type="text" placeholder="输入完整手机号" v-model="phoneNum" @input="toSearch"  @keyup.enter="search">
-        </div>
+
+        <Search v-show="isSearch"></Search>
+        
          <div class="line" v-show="false"></div>
 
         <router-view v-if="isRouterAlive"/>
@@ -30,6 +31,7 @@ import AddUser from "./AddUser";
 import Details from "./Details";
 import Navigation from "./Navigation";
 import NewUser from "./NewUser";
+import Search from "./Search";
 
 export default {
   name: "Home",
@@ -43,17 +45,32 @@ export default {
       isRouterAlive: true,
       isLogout: false,
       name: "", //当前登录客服
-      showSearch: 1
+      showSearch: 1,
+      isSearch: true
     };
   },
   components: {
     AddUser,
     Details,
     Navigation,
-    NewUser
+    NewUser,
+    Search
   },
-
+  watch: {
+    $route: "getPath"
+  },
   methods: {
+    getPath() {
+      var that = this;
+      console.log(that.$route.path)
+      if (that.$route.path === "/content/map") {
+          that.isSearch = false;
+      }else if(that.$route.path.indexOf("details") != -1){
+          // that.isSearch = false;
+      }else{
+           that.isSearch = true;
+      }
+    },
     toSearch() {
       if (this.phoneNum.length == 11) {
         this.search();
@@ -214,6 +231,8 @@ export default {
     var that = this;
     var token = localStorage.getItem("token");
 
+    that.getPath();
+
     if (!token) {
       that.$router.push({
         name: "Login",
@@ -236,6 +255,15 @@ export default {
       that.showSearch = that.$route.params.showSearch;
       console.log(that.showSearch, "======================2222");
     }
+
+    document.addEventListener("click", e => {
+      if (that.$refs.user) {
+        if (that.$refs.user.contains(e.target)) {
+        } else {
+          that.isLogout = false;
+        }
+      }
+    });
   }
 };
 </script>
@@ -244,18 +272,23 @@ export default {
 <style lang="less" scoped>
 .content {
   width: 100%;
-  min-height: 1080px;
+  // min-height: 1080px;
+  height: 100%;
   background-color: rgb(30, 39, 58);
   display: flex;
+  overflow: hidden;
+  position: relative;
   .nav {
-    width: 10%;
+    width: 8%;
     // height: 100%;
     flex: auto;
   }
   .box {
-    width: 90%;
+    width: 92%;
     flex: auto;
     background-color: rgb(30, 39, 58);
+    display: flex;
+    flex-direction: column;
     .user {
       width: 100%;
       height: 102px;
@@ -264,46 +297,51 @@ export default {
       padding-right: 90px;
       position: relative;
       z-index: 22;
-      .username {
-        display: inline-block;
+      .user_box {
+        width: 12%;
         float: right;
-        font-family: PingFang-SC-Medium;
-        font-size: 30px;
-        color: #fff;
-        height: 100%;
-        line-height: 102px;
-      }
-      .logout {
-        display: inline;
-        width: 12px;
-        height: 14px;
-        line-height: 102px;
-        float: right;
-        color: rgb(101, 144, 238);
-        margin-left: 20px;
-        font-size: 30px;
-      }
-      .active {
-        background-color: rgb(48, 59, 85);
-      }
-      .mine {
-        float: right;
-        margin-top: 26px;
-        margin-right: 28px;
-      }
-      .quit {
-        width: 141px;
-        height: 60px;
-        background-color: rgb(75, 92, 132);
-        text-align: center;
-        line-height: 60px;
-        color: #fff;
-        font-family: PingFang-SC-Medium;
-        font-size: 30px;
-        border-radius: 6px;
-        position: absolute;
-        top: 82px;
-        right: 70px;
+        clear: both;
+        .username {
+          display: inline-block;
+          float: right;
+          font-family: PingFang-SC-Medium;
+          font-size: 30px;
+          color: #fff;
+          height: 100%;
+          line-height: 102px;
+        }
+        .logout {
+          display: inline;
+          width: 12px;
+          height: 14px;
+          line-height: 102px;
+          float: right;
+          color: rgb(101, 144, 238);
+          margin-left: 20px;
+          font-size: 30px;
+        }
+        .active {
+          background-color: rgb(48, 59, 85);
+        }
+        .mine {
+          float: right;
+          margin-top: 26px;
+          margin-right: 28px;
+        }
+        .quit {
+          width: 141px;
+          height: 60px;
+          background-color: rgb(75, 92, 132);
+          text-align: center;
+          line-height: 60px;
+          color: #fff;
+          font-family: PingFang-SC-Medium;
+          font-size: 30px;
+          border-radius: 6px;
+          position: absolute;
+          top: 82px;
+          right: 70px;
+        }
       }
     }
     .search {
@@ -349,7 +387,7 @@ export default {
       }
     }
     .line {
-      width: 1470px;
+      // width: 1470px;
       height: 2px;
       background-color: rgb(72, 92, 133);
       margin-top: 148px;

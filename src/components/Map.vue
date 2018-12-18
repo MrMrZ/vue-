@@ -2,37 +2,53 @@
    <div class="cont">
         <div class="search_left">
               <div class="search_bar">
-                     <input type="text" v-model="name" @keyup.enter="search">
-                     <i class="el-icon-search search_icon" @click="search"></i>
-              </div>
+                     <div class="_select" @click="isSelect=!isSelect"  ref="select_box">
+                        <span class="select_txt" v-if="selectType == 1" > 商圈</span>
+                        <span class="select_txt" v-else> 店家</span>
+                        <i class="el-icon-caret-top _select_icon" v-if="isSelect"></i>
+                        <i class="el-icon-caret-bottom _select_icon" v-else></i>
+                      </div>
 
+                      <div class="_search">
+                           <input type="text" v-model="name" @keyup.enter="search">
+                         <i class="el-icon-search search_icon" @click="search"></i>
+
+                      </div>
+                      <ul class="select_type" v-show="isSelect">
+                        <li  @click="toSelect(2)">店家</li>
+                        <li  @click="toSelect(1)">商圈</li>
+                      </ul>
+              </div>
               <div class="lists">
-                      <ul class="list" ref="list" >
-                        <li  :class="{'active':isDetails==index}" v-for="(item , index ) in stopList" :key="index"  @click="showDes(0,index)"  >
-                            <div class="name_msg">
+                      <ul :class="stopList.length>0 ? 'list':'noScroll'" ref="list"  >
+                        <li  :class="{'active':isDetails==index}" v-for="(item , index ) in stopList" :key="index"   @click="showDes(0,index)"  ref="merchant"> 
+                          <div class="top_msg">
+                                 <div class="name_msg">
                               <span class="el-icon-star-on " v-if="item.work==1"></span>
                               <span class="type" v-if="item.cuisine">{{item.cuisine}}</span>
 
-                              <span class="stopName">{{item.name}}</span>
-                              <span class="distance">{{item.distance}}</span>
+                              <span class="stopName" :class="{'w85':!item.distance}">{{item.name}}</span>
+                              <span class="distance" v-show="item.distance">{{item.distance}}</span>
 
                             </div>
                             <div class="stop_phone">
                               <span class="price"><span> &yen; </span>{{item.per_person}}/人</span>
                               <span class="number">{{item.telphone}}</span>
                             </div>
-                             <div v-show="isDetails === index">
-                                <div class="location">
+                              <div class="location">
                                       {{item.address}} 
-                            </div>
+                              </div>
+                          </div>
+                             <div v-show="isDetails === index">
+                              
                             <div class="line"></div>
                             <div class="send_title">发送短信给用户</div>
                             <div class="_input">
-                                 <div class="user_phone">手机号码:</div>
+                                 <div class="user_phone">手机号码&nbsp;:</div>
                                  <div class="input_num" @click.stop><input type="text" v-model="user_phone"></div>
                             </div>
                              <div class="_input">
-                                 <div class="user_phone">称&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;呼:</div>
+                                 <div class="user_phone">称&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;呼&nbsp;:</div>
                                  <div class="input_num w98" @click.stop><input type="text" v-model="username"></div>
                                  <div class="sex_con" @click.stop>
                                       <el-radio v-model="sex" label="1">先生</el-radio>
@@ -40,12 +56,13 @@
                                  </div>
                             </div>
                              <div class="_input" @click.stop>
-                                 <div class="user_phone">用餐时间:</div>
+                                 <div class="user_phone">用餐时间&nbsp;:</div>
                                  <div class="input_num">
                                     <div class="date">
                                     <el-date-picker class="select_time"
                                       v-model="eat_time"
                                       type="datetime"
+                                      format="yyyy-MM-dd HH:mm"
                                       value-format="timestamp"
                                       placeholder=""
                                       default-time	
@@ -56,11 +73,10 @@
                             </div>
                             <div class="submit" @click.stop="sendMsg(item.id,item.name)">发送短信</div>
                              </div>
-                            <div class="showDes">
+                            <!-- <div class="showDes" v-show="fasle">
                               <i class="el-icon-caret-top triangle" v-if="isDetails ==index" ></i>
                               <i class="el-icon-caret-bottom triangle" v-else></i>
-
-                            </div>
+                            </div> -->
                         </li>
                       </ul>
 
@@ -73,7 +89,7 @@
 
                     <ul class="message_ul">
                         <li class=""> 
-                          <span>用&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;户：</span>
+                          <span>用&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 户：</span>
                            <span>{{confirmData.name}}</span>
                            <span v-if="confirmData.sex == 1">先生</span>
                            <span v-else>女士</span>
@@ -100,16 +116,27 @@
         </div>
         <div class="map_right " id ="container">
                <div class="msg_con" v-show="showMsg" ref="msg" >
-                  <span class="el-icon-star-on" v-if="star"></span>
-                  <span class="type" v-if="type">{{type}}</span>
-                  <span class="stopName">{{stopName}}</span>
-                  <span class="el-icon-caret-bottom triangle2"></span>
+                  <div class="el-icon-star-on" v-if="star"></div>
+                  <div class="type" v-if="type">{{type}}</div>
+                  <div class="stopName">{{stopName}}</div>
+                  <div class="el-icon-caret-bottom triangle2"></div>
                </div>
+
+              
+        </div>
+ <!-- 扩大选区 -->
+               <div class="expand" @click="toExpand" v-show="selectType==1 && name">
+                      <span><img src="../assets/expand@2x.png" alt=""></span>
+                      <span class="txt">扩大显示范围</span>
+               </div>
+        <div class="send_success" v-show="sendSuccess">
+          <img src="../assets/success@2x.png" alt="">
         </div>
   </div>
 </template>
 
 <script>
+// import VueTimepicker from 'vue2-timepicker';
 export default {
   name: "Home",
   data() {
@@ -140,11 +167,27 @@ export default {
       isComfirm: false,
       confirmData: {}, //确认消息
       confirmName: "",
-      confirmTime:'',
+      confirmTime: "",
+
+      isSelect: false, //是否筛选
+      selectType: 2,
+
+      sendSuccess: false,
+
+      toshowDetails: false, //是否显示详情
+      range:0,
     };
   },
   components: {},
   methods: {
+    // 筛选搜索类型
+    toSelect(index) {
+      var that = this;
+      that.selectType = index;
+      setTimeout(() => {
+        that.isSelect = false;
+      }, 300);
+    },
     //自定义信息窗体
     createInfoWindow(content) {
       // 窗体容器
@@ -219,10 +262,10 @@ export default {
       }
 
       var lnglats = lnglatsArr;
-      that.infoWindow = new AMap.InfoWindow({
-        isCustom: true,
-        offset: new AMap.Pixel(0, -50)
-      });
+      // that.infoWindow = new AMap.InfoWindow({
+      //   isCustom: true,
+      //   offset: new AMap.Pixel(-5, -40)
+      // });
 
       that.markers = []; //每次push列表的时候，清空markers数组
       for (var j = 0, marker; j < lnglats.length; j++) {
@@ -239,19 +282,33 @@ export default {
         // marker.content= that.createInfoWindow(that.merchantsList[j]);
 
         that.markers.push(marker);
-
         marker.on("click", that.markerClick);
         marker.emit("click", { target: marker });
+
+        console.log(that.isDetails, "======================数据");
+
+        setTimeout(function() {
+          that.$refs.list.scrollTop = 0;
+        }, 50); //延迟滚动到第一个
+        that.isDetails = -1;
+
+        that.showMsg = false;
       }
+
       that.map.setFitView();
     },
 
     // 关联右边地图商家
-    connectMap(event, merchant) {
+    connectMap(event, merchant, callBack) {
       var that = this;
       console.log(merchant, "================merchant");
+      if (!merchant) {
+        that.showMsg = false;
+        return;
+      }
       that.showMsg = true;
       that.stopName = merchant.name;
+
       if (merchant.cuisine) {
         that.type = merchant.cuisine;
       } else {
@@ -277,6 +334,8 @@ export default {
 
       that.infoWindow.setContent(that.$refs.msg);
       that.infoWindow.open(that.map, event.lnglat);
+
+      callBack();
     },
 
     //点击列表展示详情
@@ -301,17 +360,24 @@ export default {
           lnglat,
           "==============当前点击商家===========经纬度=========="
         );
+
         var clickHandler = function(e) {
           console.log(e, "========点击事件======", that.stopList[index]);
-          that.connectMap(e, that.stopList[index]);
+          that.connectMap(e, that.stopList[index], function() {
+            that.map.off("click", clickHandler);
+            console.log("======移除事件");
+          });
         };
         that.map.on("click", clickHandler);
         that.map.emit("click", {
           lnglat: lnglat
         });
+
+        that.showMsg = true;
       }
     },
     markerClick(e) {
+      console.log(e, "=============点击");
       var that = this;
       that.showMsg = true;
       that.stopName = e.target.getExtData().ext.name;
@@ -326,20 +392,26 @@ export default {
         that.star = false;
       }
 
+      var temp = 0;
       for (var i = 0; i < that.stopList.length; i++) {
         if (that.stopList[i].id == e.target.getExtData().ext.id) {
           that.isDetails = i;
-          // that.$refs.list.scrollTop = i*152+'px';
-          console.log("点击==========================匹配到同一家");
+          temp = i;
         }
-        //  else{
-        //   that.isDetails = -1;
-        // }
       }
+      setTimeout(function() {
+        that.$refs.list.scrollTop = temp * 264;
+      }, 50);
 
       for (var i = 0; i < that.markers.length; i++) {
         that.markers[i].setAnimation("AMAP_ANIMATION_NONE");
       }
+
+      // 信息窗体
+      that.infoWindow = new AMap.InfoWindow({
+        isCustom: true,
+        offset: new AMap.Pixel(-5, -40)
+      });
       that.infoWindow.setContent(e.target.content);
       that.infoWindow.open(that.map, e.target.getPosition());
     },
@@ -347,8 +419,10 @@ export default {
     // 搜索商家
     search() {
       var that = this;
+
       var data = {
-        name: that.name
+        name: that.name,
+        type: that.selectType
       };
       var token = localStorage.getItem("token");
 
@@ -360,12 +434,23 @@ export default {
         return;
       }
 
+      if (!that.name) {
+        return;
+      }
+
       console.log(
         data,
         "===================请求参数",
         token,
         "==========token"
       );
+
+      var loading = that.$loading({
+        lock: true,
+        text: "Loading",
+        spinner: "el-icon-loading",
+        background: "rgba(0, 0, 0, 0.7)"
+      });
       that.axios
         .get(
           "https://power.anlly.net/fuyan/v1/service/search",
@@ -384,8 +469,10 @@ export default {
         .then(
           function(res) {
             if (res.data.status == "success") {
+              loading.close();
               if (res.data.list.length > 0) {
                 that.stopList = res.data.list;
+                that.range = 0;
                 setTimeout(function() {
                   var location = [];
                   that.centerLocation = [];
@@ -401,6 +488,12 @@ export default {
 
               console.log("======================搜索商家成功", red.data).list;
             } else {
+              loading.close();
+              that.$message({
+                message: "网络错误",
+                type: "error",
+                center: true
+              });
               console.log(res.data, "=================请求失败");
             }
             //控制台打印请求成功时返回的数据
@@ -410,6 +503,12 @@ export default {
         .catch(
           function(err) {
             if (err.response) {
+              loading.close();
+              that.$message({
+                message: "登录超时，请重新登录",
+                type: "error",
+                center: true
+              });
               console.log(err.response, "=================失败");
               //控制台打印错误返回的内容
               if (err.response.status === 401) {
@@ -439,7 +538,12 @@ export default {
         });
         return;
       }
-
+      var loading = that.$loading({
+        lock: true,
+        text: "Loading",
+        spinner: "el-icon-loading",
+        background: "rgba(0, 0, 0, 0.7)"
+      });
       console.log(token, "==========token");
       that.axios
         .get(
@@ -459,12 +563,19 @@ export default {
         .then(
           function(res) {
             if (res.data.status == "success") {
+              loading.close();
               that.merchantsList = res.data.list;
               console.log("======================获取商家列表", res.data.list);
               setTimeout(function() {
                 that.showMap(that.merchantsList);
               }, 100);
             } else {
+              loading.close();
+              that.$message({
+                message: "网络错误",
+                type: "error",
+                center: true
+              });
               console.log(res.data, "=================请求失败");
             }
             //控制台打印请求成功时返回的数据
@@ -474,6 +585,12 @@ export default {
         .catch(
           function(err) {
             if (err.response) {
+              loading.close();
+              that.$message({
+                message: "登录超时，请重新登录",
+                type: "error",
+                center: true
+              });
               console.log(err.response, "=================失败");
               //控制台打印错误返回的内容
               if (err.response.status === 401) {
@@ -489,39 +606,85 @@ export default {
           }.bind(this)
         );
     },
+    add0(m) {
+      return m < 10 ? "0" + m : m;
+    },
     timestampToTime(timestamp) {
-      var date = new Date(timestamp); //时间戳为10位需*1000，时间戳为13位的话不需乘1000
-      var Y = date.getFullYear() + ".";
-      var M =
-        (date.getMonth() + 1 < 10
-          ? "0" + (date.getMonth() + 1)
-          : date.getMonth() + 1) + ".";
-      var D = date.getDate() + " ";
-      var h = date.getHours() + ":";
-      var m = date.getMinutes() + ":";
-      var s = date.getSeconds();
-      return Y + M + D + h + m + s;
+      var that = this;
+      var time = new Date(timestamp);
+      var y = time.getFullYear();
+      var m = time.getMonth() + 1;
+      var d = time.getDate();
+      var h = time.getHours();
+      var mm = time.getMinutes();
+      var s = time.getSeconds();
+      return (
+        y +
+        "-" +
+        that.add0(m) +
+        "-" +
+        that.add0(d) +
+        " " +
+        that.add0(h) +
+        ":" +
+        that.add0(mm)
+      );
     },
     //发短信
     sendMsg(id, name) {
       var that = this;
 
       if (!that.username) {
-        that.$message("请输入称呼");
+        that.$message({
+          message: "请输入称呼",
+          type: "warning",
+          center: true
+        });
         return;
       }
 
       if (!that.user_phone) {
-        that.$message("请输入手机号码");
+        that.$message({
+          message: "请输入手机号码",
+          type: "warning",
+          center: true
+        });
         return;
       }
 
       if (!that.sex) {
-        that.$message("请选择性别");
+        that.$message({
+          message: "请选择性别",
+          type: "warning",
+          center: true
+        });
         return;
       }
       if (!that.eat_time) {
-        that.$message("请选择时间");
+        that.$message({
+          message: "请选择时间",
+          type: "warning",
+          center: true
+        });
+        return;
+      }
+
+      if (!that.isPoneAvailable(that.user_phone)) {
+        that.$message({
+          message: "请输入正确手机号码",
+          type: "warning",
+          center: true
+        });
+        return;
+      }
+
+      var current = new Date().getTime();
+      if (that.eat_time < current) {
+        that.$message({
+          message: "用餐时间必须大于当前时间",
+          type: "warning",
+          center: true
+        });
         return;
       }
 
@@ -556,6 +719,13 @@ export default {
         that.confirmData,
         "==========请求参数"
       );
+
+      var loading = that.$loading({
+        lock: true,
+        text: "Loading",
+        spinner: "el-icon-loading",
+        background: "rgba(0, 0, 0, 0.7)"
+      });
       that.axios
         .post(
           "https://power.anlly.net/fuyan/v1/service/sms",
@@ -574,17 +744,27 @@ export default {
         .then(
           function(res) {
             if (res.data.status == "success") {
+              loading.close();
               console.log("======================发送成功", res.data.list);
               that.confirmData = {};
               that.isComfirm = false;
               that.confirmName = "";
-              that.$message({
-                message: "发送成功",
-                type: "success"
-              });
+              that.sendSuccess = true;
+              setTimeout(function() {
+                that.sendSuccess = false;
+              }, 1500);
+
+              that.username = "";
+              that.sex = "";
+              that.user_phone = "";
             } else {
               console.log(res.data.list, "=================发送失败");
-              that.$message.error("发送失败");
+              loading.close();
+              that.$message({
+                message: "网络错误",
+                type: "error",
+                center: true
+              });
             }
             //控制台打印请求成功时返回的数据
             //bind(this)可以不用
@@ -593,6 +773,12 @@ export default {
         .catch(
           function(err) {
             if (err.response) {
+              loading.close();
+              that.$message({
+                message: "登录超时，请重新登录",
+                type: "error",
+                center: true
+              });
               console.log(err.response, "=================失败");
               //控制台打印错误返回的内容
               if (err.response.status === 401) {
@@ -607,15 +793,138 @@ export default {
             //bind(this)可以不用
           }.bind(this)
         );
-    }
+    },
+
+    isPoneAvailable(phoneNum) {
+      var myreg = /^[1][3,4,5,7,8][0-9]{9}$/;
+      if (!myreg.test(phoneNum)) {
+        return false;
+      } else {
+        return true;
+      }
+    },
+
+    // 扩大选区
+    toExpand(){
+        var that = this;
+        var that = this;
+        that.range = that.range+1;
+        var data = {
+          name: that.name,
+          type: that.selectType,
+          range:that.range
+        };
+      var token = localStorage.getItem("token");
+
+      if (!token) {
+        that.$router.push({
+          name: "Login",
+          params: {}
+        });
+        return;
+      }
+
+      if (!that.name) {
+        return;
+      }
+
+      console.log(
+        data,
+        "===================请求参数",
+        token,
+        "==========token"
+      );
+
+      var loading = that.$loading({
+        lock: true,
+        text: "Loading",
+        spinner: "el-icon-loading",
+        background: "rgba(0, 0, 0, 0.7)"
+      });
+      that.axios
+        .get(
+          "https://power.anlly.net/fuyan/v1/service/search",
+          {
+            params: data,
+            headers: {
+              // "Access-Control-Allow-Origin": "*",
+              // "Content-Type": "application/json; charset=utf-8"
+              token: token
+            }
+          },
+          {
+            xhrFields: { withCredentials: true }
+          }
+        )
+        .then(
+          function(res) {
+            if (res.data.status == "success") {
+              loading.close();
+              if (res.data.list.length > 0) {
+                that.stopList = res.data.list;
+                setTimeout(function() {
+                  var location = [];
+                  that.centerLocation = [];
+                  location.push(Number(res.data.location.longitude));
+                  location.push(Number(res.data.location.latitude));
+                  that.centerLocation = location;
+                  that.showMap(that.stopList);
+                  console.log(res.data, "====================商家列表");
+                }, 100);
+              } else {
+                that.$message("暂无搜索结果");
+              }
+
+              console.log("======================搜索商家成功", red.data).list;
+            } else {
+              loading.close();
+              that.$message({
+                message: "网络错误",
+                type: "error",
+                center: true
+              });
+              console.log(res.data, "=================请求失败");
+            }
+            //控制台打印请求成功时返回的数据
+            //bind(this)可以不用
+          }.bind(this)
+        )
+        .catch(
+          function(err) {
+            if (err.response) {
+              loading.close();
+              that.$message({
+                message: "登录超时，请重新登录",
+                type: "error",
+                center: true
+              });
+              console.log(err.response, "=================失败");
+              //控制台打印错误返回的内容
+              if (err.response.status === 401) {
+                that.$router.push({
+                  name: "Login",
+                  params: {
+                    // info: that.info
+                  }
+                });
+              }
+            }
+            //bind(this)可以不用
+          }.bind(this)
+        );
+    },
   },
   mounted() {
     var that = this;
     that.getStopLists();
-    this.$message({
-          message: '恭喜你，这是一条成功消息',
-          type: 'success'
-        });
+    document.addEventListener("click", e => {
+      if (that.$refs.select_box) {
+        if (that.$refs.select_box.contains(e.target)) {
+        } else {
+          that.isSelect = false;
+        }
+      }
+    });
   }
 };
 </script>
@@ -624,108 +933,176 @@ export default {
 <style lang="less" scoped>
 .cont {
   width: 100%;
-  height: 1080px;
+  // height: 1080px;
+  height: 100%;
   display: flex;
+  position: relative;
   .search_left {
     // width: 570px;
-    width: 35%;
-    height: 1000px;
+    width: 32%;
+    // height: 1000px;
+    height: 100%;
     // background-color: #cff;
     flex: auto;
     box-sizing: border-box;
     padding-top: 23px;
     padding-left: 23px;
     padding-right: 23px;
+    display: flex;
+    flex-direction: column;
     .search_bar {
       width: 100%;
       height: 60px;
-      background-color: rgb(48, 63, 95);
-      border-radius: 6px;
-      border: 1px solid rgb(117, 136, 177);
-      input {
+      display: flex;
+      flex: auto;
+      position: relative;
+      ._search {
         width: 80%;
+        position: relative;
+
+        input {
+          width: 100%;
+          height: 100%;
+          background: none;
+          border: none;
+          outline: none;
+          font-size: 30px;
+          font-family: PingFang-SC-Medium;
+          color: #fff;
+          box-sizing: border-box;
+          // padding-right:60px;
+          padding-left: 20px;
+          background-color: rgb(48, 63, 95);
+          border-radius: 6px;
+          border: 1px solid rgb(117, 136, 177);
+        }
+        .search_icon {
+          font-size: 30px;
+          float: right;
+          line-height: 60px;
+          color: #fff;
+          // margin-right: 20px;
+          position: absolute;
+          right: 20px;
+          top: -2px;
+        }
+      }
+
+      ._select {
+        width: 125px;
         height: 100%;
+        border: 1px solid #000;
         background: none;
         border: none;
-        outline: none;
-        font-size: 40px;
-        font-family: PingFang-SC-Medium;
-        color: #fff;
-        padding-left: 20px;
+        cursor: pointer;
+        .select_txt {
+          font-size: 36px;
+          color: #fff;
+          line-height: 60px;
+          font-family: PingFang-SC-Medium;
+        }
+
+        ._select_icon {
+          color: rgb(117, 136, 177);
+          font-size: 34px;
+        }
       }
-      .search_icon {
-        font-size: 30px;
-        float: right;
-        line-height: 60px;
-        color: #fff;
-        margin-right: 20px;
+      .select_type {
+        width: 185px;
+        height: 130px;
+        position: absolute;
+        left: 0;
+        top: 68px;
+        z-index: 22;
+        border-radius: 6px;
+        background-color: rgb(75, 92, 132);
+        border: 1px solid rgb(117, 136, 177);
+
+        li {
+          width: 100%;
+          height: 64px;
+          line-height: 64px;
+          font-size: 30px;
+          font-family: PingFang-SC-Medium;
+          text-align: center;
+          color: #fff;
+          cursor: pointer;
+        }
+        li:first-child {
+          border-bottom: 2px solid rgb(117, 136, 177);
+        }
       }
     }
     .lists {
       width: 100%;
-      height: 960px;
+      // height: 500px;
+      height: 100%;
       margin-top: 20px;
       border-radius: 4px;
       background-color: rgb(48, 63, 95);
       overflow: hidden;
       position: relative;
+      box-sizing: border-box;
       ul {
         width: 100%;
         height: 100%;
+        overflow: hidden;
         overflow-y: scroll;
         li {
-          box-sizing: border-box;
-          padding-left: 18px;
-          padding-right: 18px;
-          padding-top: 19px;
+          width: 100%;
           border: 2px solid rgb(117, 136, 177);
+          .top_msg {
+            box-sizing: border-box;
+            padding-top: 32px;
+            padding-bottom: 18px;
+            height: 260px;
+          }
           .name_msg {
-            // display: flex;
-            // justify-content: flex-start;
             align-items: center;
             line-height: 30px;
             overflow: hidden;
-            // border: 1px solid #000;
+            box-sizing: border-box;
+            padding-left: 22px;
+            padding-right: 22px;
+            display: flex;
+            justify-content: space-around;
             .el-icon-star-on {
               color: rgb(255, 216, 0);
               font-size: 28px;
-              float: left;
               margin-right: 12px;
             }
             .type {
               display: inline-block;
-              min-width: 24px;
-              height: 24px;
+              width: 64px;
+              height: 32px;
               background-color: rgb(204, 158, 90);
               text-align: center;
-              line-height: 22px;
+              // line-height: 32px;
               color: #fff;
-              font-size: 20px;
+              font-size: 28px;
               font-family: PingFang-SC-Bold;
               margin-right: 12px;
               overflow: hidden;
               text-overflow: ellipsis;
               white-space: nowrap;
-              float: left;
-              margin-top: 4px;
             }
             .stopName {
               display: inline-block;
-              width: 60%;
+              width: 52%;
               font-family: PingFang-SC-Medium;
               font-size: 30px;
               color: #fff;
-              // margin-left: 12px;
               overflow: hidden;
               text-overflow: ellipsis;
               white-space: nowrap;
-              float: left;
             }
             .distance {
               font-family: PingFang-SC-Medium;
               color: rgb(234, 188, 119);
               font-size: 30px;
-              float: right;
+            }
+            .w85 {
+              width: 71%;
             }
           }
           .stop_phone {
@@ -733,6 +1110,9 @@ export default {
             margin-top: 19px;
             display: flex;
             justify-content: space-around;
+            box-sizing: border-box;
+            padding-left: 22px;
+            padding-right: 22px;
             .price {
               width: 35%;
               font-family: PingFang-SC-Medium;
@@ -760,7 +1140,10 @@ export default {
             font-family: PingFang-SC-Medium;
             font-size: 26px;
             color: #fff;
-            margin-top: 19px;
+            margin-top: 14px;
+            box-sizing: border-box;
+            padding-left: 22px;
+            padding-right: 22px;
           }
           ._input {
             width: 100%;
@@ -768,6 +1151,9 @@ export default {
             justify-content: flex-start;
             align-items: center;
             margin-top: 29px;
+            box-sizing: border-box;
+            padding-left: 22px;
+            padding-right: 22px;
             .user_phone {
               font-family: PingFang-SC-Medium;
               font-size: 28px;
@@ -780,7 +1166,7 @@ export default {
               border-radius: 4px;
               background-color: rgb(48, 63, 95);
               border: 1px solid rgb(117, 136, 177);
-              margin-left: 10px;
+              margin-left: 0px;
               input {
                 width: 100%;
                 height: 100%;
@@ -795,25 +1181,38 @@ export default {
               /deep/.el-input__inner {
                 background: none;
                 color: #fff;
-                font-size: 17px;
+                font-size: 24px;
                 border: none;
                 margin-top: 4px;
+                margin-left: 10px;
+              }
+              /deep/ .el-input {
+                width: 100%;
+              }
+              /deep/.el-input__icon {
+                height: 50px;
+                font-size: 24px;
+                margin-top: -2px;
+                margin-left: 0px;
               }
             }
             .sex_con {
               // width: 170px;
               margin-left: 10px;
-
               /deep/ .el-radio {
                 margin-left: 5px;
               }
               /deep/ .el-radio__label {
-                font-size: 21px;
+                font-size: 25px;
                 color: #fff;
+              }
+              /deep/.el-radio__inner {
+                width: 18px;
+                height: 18px;
               }
             }
             .w98 {
-              width: 125px;
+              width: 100px;
             }
           }
           .line {
@@ -823,7 +1222,7 @@ export default {
             margin-top: 26px;
           }
           .send_title {
-            color: rgb(90, 58, 208);
+            color: rgb(44, 122, 245);
             font-family: AdobeHeitiStd-Regular;
             font-size: 30px;
             text-align: center;
@@ -839,7 +1238,7 @@ export default {
             font-family: PingFang-SC-Medium;
             font-size: 30px;
             color: #fff;
-            margin: 34px auto 10px;
+            margin: 34px auto;
           }
           .showDes {
             width: 100%;
@@ -870,6 +1269,10 @@ export default {
         border-radius: 11px;
         background-color: rgb(48, 63, 95);
       } /* 滑块颜色 */
+
+      .noScroll {
+        overflow: hidden;
+      }
     }
     .confirm_box {
       width: 609px;
@@ -878,7 +1281,7 @@ export default {
       border-radius: 15px;
       border: 4px solid rgb(117, 136, 177);
       position: absolute;
-      left: 134px;
+      left: -24px;
       top: 290px;
       z-index: 22;
       .title {
@@ -888,19 +1291,21 @@ export default {
         line-height: 91px;
         color: #fff;
         font-family: PingFang-SC-Medium;
-        font-size: 30px;
+        font-size: 36px;
         border-bottom: 4px solid rgb(48, 63, 95);
       }
       .message_ul {
         width: 100%;
         box-sizing: border-box;
         padding-left: 67px;
-        padding-top: 28px;
+        padding-top: 15px;
         li {
           font-family: PingFang-SC-Medium;
           font-size: 32px;
           color: #fff;
-          margin-top: 10px;
+          margin-top: 15px;
+          display: flex;
+          flex: auto;
         }
         .w200 {
           display: inline-block;
@@ -942,33 +1347,34 @@ export default {
     }
   }
   .map_right {
-    width: 65%;
+    width: 67%;
     height: 100%;
     background-color: #ffc;
     flex: auto;
     div.msg_con {
-      width: 250px;
+      min-width: 200px;
+      // width: 200px;
       height: 50px;
-      text-align: center;
+      // text-align: center;
       line-height: 50px;
       position: relative;
       z-index: 9999;
       background-color: rgb(30, 39, 58);
       color: #fff;
       border-radius: 6px;
-      display: flex;
-      justify-content: flex-start;
-      align-items: center;
-      position: relative;
       box-sizing: border-box;
       padding-left: 5px;
       padding-right: 5px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
       .el-icon-star-on {
         color: rgb(255, 216, 0);
         font-size: 28px;
       }
       .type {
-        display: inline-block;
+        // display: inline-block;
         min-width: 50px;
         height: 24px;
         background-color: rgb(204, 158, 90);
@@ -980,21 +1386,22 @@ export default {
         margin-left: 5px;
       }
       .stopName {
-        display: inline-block;
-        width: 80%;
+        // display: inline-block;
+        // width: 80%;
         font-family: PingFang-SC-Medium;
         font-size: 30px;
         color: #fff;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+        text-align: center;
         margin-left: 5px;
       }
       .triangle2 {
         color: rgb(30, 39, 58);
         font-size: 30px;
         position: absolute;
-        left: 45%;
+        left: 50%;
         bottom: -16px;
       }
     }
@@ -1005,6 +1412,56 @@ export default {
     height: 100%;
     background-color: #ffc;
     flex: auto;
+  }
+  .expand {
+    width: 239px;
+    height: 53px;
+    border-radius: 26px;
+    background-color: rgb(42, 83, 178);
+    position: absolute;
+    bottom: 41px;
+    right: 25px;
+    z-index: 9999;
+    box-shadow: 2px 11px 29px rgba(36, 42, 56, 0.5);
+    display: flex;
+    justify-content: center;
+    box-sizing: border-box;
+    padding-top: 8px;
+    cursor: pointer;
+    -moz-user-select:none; /* Firefox私有属性 */
+    -webkit-user-select:none; /* WebKit内核私有属性 */
+    -ms-user-select:none; /* IE私有属性(IE10及以后) */
+    -khtml-user-select:none; /* KHTML内核私有属性 */
+    -o-user-select:none; /* Opera私有属性 */
+    user-select:none; /* CSS3属性 */
+
+
+    img {
+      width: 34px;
+      height: 34px;
+      margin-right: 10px;
+      margin-top: 2px;
+    }
+    .txt {
+      font-family: PingFang-SC-Medium;
+      font-size: 26px;
+      color: rgb(254, 254, 254);
+    }
+  }
+  .send_success {
+    width: 321px;
+    height: 91px;
+    position: absolute;
+    left: 50%;
+    margin-left: -160px;
+    top: -20px;
+    z-index: 33;
+  }
+  .msgStyle {
+    background-color: #ffc;
+  }
+  /deep/.el-message--success {
+    background-color: #fcc;
   }
 }
 </style>

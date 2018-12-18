@@ -79,13 +79,12 @@ export default {
 <style lang="less" scoped>
 .content {
   width: 100%;
-  height: 500px;
+  // height: 700px;
   background-color: rgb(30, 39, 58);
-
   .Tip {
     width: 743px;
     height: 350px;
-    margin: 132px auto;
+    margin:132px auto;
     box-sizing: border-box;
     .title {
       width: 100%;
@@ -100,11 +99,11 @@ export default {
       width: 100%;
       height: 160px;
       text-align: center;
-      line-height: 160px;
+      line-height: 110px;
       font-size: 60px;
       font-family: PingFang-SC-Medium;
       color: #fff;
-      margin-top: 40px;
+      // margin-top: 10px;
     }
 
     .btn {
@@ -112,7 +111,7 @@ export default {
       height: 80px;
       clear: both;
       box-sizing: border-box;
-      margin-top: 100px;
+      margin-top: 30px;
       div {
         text-align: center;
         line-height: 80px;

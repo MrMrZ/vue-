@@ -11,7 +11,7 @@ export default {
   name: "Home",
   data() {
     return {
-      isActive:2,
+      isActive:1,
     };
   },
   methods: {
@@ -21,7 +21,7 @@ export default {
       that.isActive = index;
       if (index == 1) {
         that.$router.push({
-          name: "Search",
+          name: "Content",
           params: {
           }
         });
@@ -32,6 +32,16 @@ export default {
           }
         });
       }
+    }
+  },
+
+  mounted(){
+     var that = this;
+    
+    if(that.$route.path === "/content/search"){
+        that.isActive = 1;
+    }else if(that.$route.path === "/content/map"){
+       that.isActive = 2;
     }
   }
 };
