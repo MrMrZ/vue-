@@ -2,6 +2,9 @@
    <div class="content1" >
        <div class="title1" @click="toPages(1)" :class="{'active':isActive==1}">录入</div>
        <div class="title1" @click="toPages(2)"  :class="{'active':isActive==2}">搜索</div>
+       <div class="title1" @click="toPages(3)"  :class="{'active':isActive==3}">关联</div>
+       <div class="title1" @click="toPages(4)"  :class="{'active':isActive==4}">订单</div>
+
 
    </div>
 </template>
@@ -31,6 +34,18 @@ export default {
           params: {
           }
         });
+      }else if(index == 3){
+        that.$router.push({
+          name: "Association",
+          params: {
+          }
+        });
+      }else if(index == 4){
+        that.$router.push({
+          name: "Order",
+          params: {
+          }
+        });
       }
     }
   },
@@ -38,10 +53,14 @@ export default {
   mounted(){
      var that = this;
     
-    if(that.$route.path === "/content/search"){
+    if(that.$route.path === "/content"){
         that.isActive = 1;
     }else if(that.$route.path === "/content/map"){
        that.isActive = 2;
+    }else if(that.$route.path === "/content/association"){
+       that.isActive = 3;
+    }else if(that.$route.path === "/content/order"){
+       that.isActive = 4;
     }
   }
 };

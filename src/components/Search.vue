@@ -244,7 +244,7 @@ export default {
       color: #fff;
       float: right;
       position: absolute;
-      top: 66px;
+      top: 60px;
       right: 50%;
       margin-right: -220px;
       z-index: 22;

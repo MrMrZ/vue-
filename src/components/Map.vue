@@ -124,11 +124,11 @@
 
               
         </div>
- <!-- 扩大选区 -->
-               <div class="expand" @click="toExpand" v-show="selectType==1 && name">
-                      <span><img src="../assets/expand@2x.png" alt=""></span>
-                      <span class="txt">扩大显示范围</span>
-               </div>
+        <!-- 扩大选区 -->
+        <div class="expand" @click="toExpand" v-show="selectType==1 && name">
+              <span><img src="../assets/expand@2x.png" alt=""></span>
+              <span class="txt">扩大商圈范围</span>
+        </div>
         <div class="send_success" v-show="sendSuccess">
           <img src="../assets/success@2x.png" alt="">
         </div>
@@ -407,7 +407,7 @@ export default {
         that.markers[i].setAnimation("AMAP_ANIMATION_NONE");
       }
 
-      // 信息窗体
+      // 显示信息窗体
       that.infoWindow = new AMap.InfoWindow({
         isCustom: true,
         offset: new AMap.Pixel(-5, -40)

@@ -9,7 +9,8 @@ import Details from '@/components/Details'
 import NewUser from '@/components/NewUser'
 import TheMap from '@/components/Map'
 import Search from '@/components/Search'
-
+import Association from '@/components/Association'
+import Order from '@/components/Order'
 
 
 Vue.use(Router)
@@ -61,6 +62,16 @@ export default new Router({
           path: 'search',
           name: 'Search',
           component:Search
+        },
+        {
+          path: 'association',
+          name: 'Association',
+          component:Association
+        },
+        {
+          path: 'order',
+          name: 'Order',
+          component:Order
         }
       ]
     },

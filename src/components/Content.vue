@@ -65,8 +65,10 @@ export default {
       console.log(that.$route.path)
       if (that.$route.path === "/content/map") {
           that.isSearch = false;
-      }else if(that.$route.path.indexOf("details") != -1){
-          // that.isSearch = false;
+      }else if(that.$route.path === "/content/association"){
+          that.isSearch = false;
+      }else if(that.$route.path === "/content/order"){
+          that.isSearch = false;
       }else{
            that.isSearch = true;
       }
