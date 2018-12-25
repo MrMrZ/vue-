@@ -435,7 +435,8 @@ export default {
       var that = this;
 
       var data = {
-        phone: that.showInfo.phone
+        phone: that.showInfo.phone,
+        type: 1
       };
 
       var token = localStorage.getItem("token");
@@ -478,16 +479,11 @@ export default {
         )
         .then(
           function(res) {
-            console.log(res.data, "=================请求成功");
             if (res.data.status == "success") {
+          
               that.showInfo = res.data.info;
               that.info = JSON.stringify(res.data.info);
-
-              console.log(
-                that.info,
-                "=========================",
-                that.showInfo
-              );
+              console.log( res.data.info, "=========================详情信息==============",   that.showInfo   );
               loading.close();
             } else if (res.data.status == "error") {
               loading.close();
@@ -1028,27 +1024,28 @@ export default {
       that.search();
       that.getRecord();
     }
+    
   },
-  created() {
-    // var that = this;
-    // //获取传入的参数
-    // if (that.$route.params.info) {
-    //   that.info = that.$route.params.info;
-    //   console.log(that.info, "==============参数============");
-    //   that.showInfo = that.$route.params.info;
-    // }
-    // if (localStorage.getItem("phone")) {
-    //   var phone = localStorage.getItem("phone");
-    //   that.showInfo.phone = phone;
-    //   that.search();
-    //   that.getRecord();
-    // }
-  }
+  created() {}
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="less"  >
+.content2::-webkit-scrollbar {
+  width: 22px;
+  height: 100%;
+  background-color: rgb(117, 136, 177);
+}
+.content2::-webkit-scrollbar-track {
+  background-color: rgb(117, 136, 177);
+} /* 滚动条的滑轨背景颜色 */
+
+.content2::-webkit-scrollbar-thumb {
+  height: 120px;
+  border-radius: 11px;
+  background-color: rgb(48, 63, 95);
+}
 .content2 {
   width: 100%;
   // height: 800px;
@@ -1062,9 +1059,8 @@ export default {
   .message {
     width: 90%;
     // height: 293px;
-    margin-left: 101px;
-    margin-top: 20px;
-
+    // margin-left: 20px;
+    margin: 20px auto;
     .phone {
       font-family: PingFang-SC-Bold;
       font-size: 60px;
@@ -1076,11 +1072,10 @@ export default {
       clear: both;
       background-color: rgb(43, 55, 81);
       border-radius: 20px;
-      // box-sizing: border-box;
+      box-sizing: border-box;
       padding-left: 48px;
       padding-top: 10px;
-      margin: 20px;
-
+      margin-top: 20px;
       .msg_con {
         width: 70%;
         height: 100%;
@@ -1136,7 +1131,7 @@ export default {
               font-family: PingFang-SC-Medium;
               font-size: 30px;
               color: #fff;
-              margin-top: 18px; 
+              margin-top: 18px;
             }
             .active {
               border-radius: 10px;
@@ -1237,12 +1232,10 @@ export default {
   }
 
   .record_con {
-    width: 90%;
+    width: 89.5%;
     // width: 1470px;
     // height: 293px;
-    margin-left: 101px;
-    margin-top: 36px;
-
+    margin: 36px auto;
     .title_con {
       width: 100%;
       height: 91px;
@@ -1276,6 +1269,7 @@ export default {
       // height:293px ;
       background-color: rgb(43, 55, 81);
       border-radius: 20px;
+      box-sizing: border-box;
       padding-left: 32px;
       padding-bottom: 32px;
       overflow: hidden;

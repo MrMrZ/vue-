@@ -291,7 +291,7 @@ export default {
       var remarks = that.textarea;
 
       if (that.cars) {
-        remarks += "," + that.cars + "辆车";
+           remarks += "," + that.cars + "辆车";
       }
       if (that.jobs) {
         var jobs = "";
@@ -332,6 +332,7 @@ export default {
 
         remarks += "," + years;
       }
+      
       if (that.kids) {
         if (that.kids == 3) {
           remarks += "," + that.kids + "个孩子以上";
@@ -540,6 +541,12 @@ export default {
               font-size: 28px;
               color: #fff;
             }
+          }
+          li:nth-child(4){
+            width: 174px;
+          }
+           li:nth-child(5){
+            width: 174px;
           }
         }
       }

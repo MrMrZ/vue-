@@ -45,8 +45,18 @@
                             <div class="send_title">发送短信给用户</div>
                             <div class="_input">
                                  <div class="user_phone">手机号码&nbsp;:</div>
-                                 <div class="input_num" @click.stop><input type="text" v-model="user_phone"></div>
-                            </div>
+                                 <div class="input_num" @click.stop><input type="text" v-model="user_phone" @keyup="selectPhone"></div>
+                                  <div class="phoneList">
+                                        <ul>
+                                          <li v-for="item in phoneList" :key="item.id" @click.stop="choosePhone(item)">
+                                            <span>{{item.phone}}</span> &nbsp;&nbsp;
+                                            <span>{{item.realname}}</span>
+                                            <span v-if="item.sex == 1">先生</span>
+                                            <span v-else>女士</span>
+                                          </li>
+                                        </ul>  
+                                  </div> 
+                           </div>
                              <div class="_input">
                                  <div class="user_phone">称&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;呼&nbsp;:</div>
                                  <div class="input_num w98" @click.stop><input type="text" v-model="username"></div>
@@ -70,6 +80,10 @@
                                     </el-date-picker>
                                  </div>
                                  </div>
+                            </div>
+                             <div class="_input">
+                                 <div class="user_phone">预约房号&nbsp;:</div>
+                                 <div class="input_num" @click.stop><input type="text" v-model="room_name"></div>
                             </div>
                             <div class="submit" @click.stop="sendMsg(item.id,item.name)">发送短信</div>
                              </div>
@@ -103,9 +117,14 @@
                             <span class="w200">{{confirmName}}</span>
                         </li>
                          <li class=""> 
+                          <span>预订房号：</span>
+                           <span>{{confirmData.room_name}}</span>
+                        </li>
+                         <li class=""> 
                           <span>用餐时间：</span>
                            <span>{{confirmTime}}</span>
                         </li>
+
                     </ul>
 
                     <div class="btn_con">
@@ -176,6 +195,11 @@ export default {
 
       toshowDetails: false, //是否显示详情
       range:0,
+      room_name:'',
+
+
+      phoneList:[], //模糊查找列表
+
     };
   },
   components: {},
@@ -505,13 +529,19 @@ export default {
             if (err.response) {
               loading.close();
               that.$message({
-                message: "登录超时，请重新登录",
+                message: "网络错误",
                 type: "error",
                 center: true
               });
               console.log(err.response, "=================失败");
               //控制台打印错误返回的内容
               if (err.response.status === 401) {
+                 loading.close();
+                  that.$message({
+                    message: "登录超时，请重新登录",
+                    type: "error",
+                    center: true
+                  });
                 that.$router.push({
                   name: "Login",
                   params: {
@@ -568,6 +598,8 @@ export default {
               console.log("======================获取商家列表", res.data.list);
               setTimeout(function() {
                 that.showMap(that.merchantsList);
+              that.stopList =  that.merchantsList
+                
               }, 100);
             } else {
               loading.close();
@@ -678,6 +710,17 @@ export default {
         return;
       }
 
+      
+      if (!that.room_name) {
+        that.$message({
+          message: "请输入预约房号",
+          type: "warning",
+          center: true
+        });
+        return;
+      }
+
+
       var current = new Date().getTime();
       if (that.eat_time < current) {
         that.$message({
@@ -693,7 +736,8 @@ export default {
         sex: that.sex,
         phone: that.user_phone,
         id: id,
-        eat_time: that.eat_time / 1000
+        eat_time: that.eat_time / 1000,
+        room_name:that.room_name
       };
 
       that.confirmData = data;
@@ -757,6 +801,8 @@ export default {
               that.username = "";
               that.sex = "";
               that.user_phone = "";
+              that.room_name = "";
+
             } else {
               console.log(res.data.list, "=================发送失败");
               loading.close();
@@ -913,6 +959,122 @@ export default {
           }.bind(this)
         );
     },
+
+    
+    // 模糊匹配手机号
+    selectPhone() {
+      var that = this;
+     
+      if(!that.user_phone){
+          that.phoneList = [];
+          return;
+          
+      }
+      var data = {
+        phone: that.user_phone,
+        type:2
+      };
+      var token = localStorage.getItem("token");
+
+      if (!token) {
+        that.$router.push({
+          name: "Login",
+          params: {}
+        });
+        return;
+      }
+
+      console.log(
+        data,
+        "===================请求参数",
+        token,
+        "==========token"
+      );
+
+      var loading = that.$loading({
+        lock: true,
+        text: "Loading",
+        spinner: "el-icon-loading",
+        background: "rgba(0, 0, 0, 0.7)"
+      });
+      that.axios
+        .get(
+          "https://power.anlly.net/fuyan/v1/service/phone",
+          {
+            params: data,
+            headers: {
+              // "Access-Control-Allow-Origin": "*",
+              // "Content-Type": "application/json; charset=utf-8"
+              token: token
+            }
+          },
+          {
+            xhrFields: { withCredentials: true }
+          }
+        )
+        .then(
+          function(res) {
+            console.log(res.data, "=================模糊查找成功");
+            if (res.data.status == "success") {
+              loading.close();
+              if(res.data.list.length!=0){
+                that.phoneList = res.data.list;
+              }else{
+                that.phoneList = [];
+                 that.username = ''
+                that.sex = '';
+
+              }
+            } else if (res.data.status == "error") {
+              loading.close();
+
+              that.$message({
+                message: "网络错误",
+                type: "error",
+                 center:true,
+              });
+            }
+
+            //控制台打印请求成功时返回的数据
+            //bind(this)可以不用
+          }.bind(this)
+        )
+        .catch(
+          function(err) {
+            if (err.response) {
+              loading.close();
+              that.$message({
+                message: "登录超时，请重新登录",
+                type: "error",
+                 center:true,
+              });
+              console.log(err.response, "=================失败");
+              //控制台打印错误返回的内容
+              if (err.response.status === 401) {
+                that.$router.push({
+                  name: "Login",
+                  params: {
+                    // info: that.info
+                  }
+                });
+              }
+            }
+            //bind(this)可以不用
+          }.bind(this)
+        );
+    },
+
+    //选择手机号
+    choosePhone(item){
+       var that = this;
+       
+       that.username = item.realname,
+       that.user_phone = item.phone;
+       that.sex = item.sex;
+
+       that.phoneList = [];
+
+    },
   },
   mounted() {
     var that = this;
@@ -1051,6 +1213,7 @@ export default {
         li {
           width: 100%;
           border: 2px solid rgb(117, 136, 177);
+       
           .top_msg {
             box-sizing: border-box;
             padding-top: 32px;
@@ -1154,6 +1317,7 @@ export default {
             box-sizing: border-box;
             padding-left: 22px;
             padding-right: 22px;
+            position: relative;
             .user_phone {
               font-family: PingFang-SC-Medium;
               font-size: 28px;
@@ -1214,7 +1378,32 @@ export default {
             .w98 {
               width: 100px;
             }
+             .phoneList{
+                width:284px;
+                // min-height: 100px;
+                // border: 1px solid red;
+                position: absolute;
+                right: 22px;
+                top: 50px;
+                z-index: 22;
+                background-color: rgb(48, 63, 95);
+                ul{
+                   overflow-y: hidden;
+                   li{
+                     width: 100%;
+                     height: 44px;
+                     line-height: 44px;
+                     color:#fff;
+                     font-size: 24px;
+                     box-sizing: border-box;
+                     padding-left: 10px;
+                     border: 1px solid rgb(117, 136, 177);
+                   }
+                   
+                }
           }
+          }
+         
           .line {
             width: 100%;
             height: 2px;
@@ -1275,33 +1464,33 @@ export default {
       }
     }
     .confirm_box {
-      width: 609px;
+      width: 551px;
       height: 453px;
       background-color: rgb(24, 43, 86);
       border-radius: 15px;
       border: 4px solid rgb(117, 136, 177);
       position: absolute;
-      left: -24px;
-      top: 290px;
-      z-index: 22;
+      left: 500px;
+      top: -58px;
+      z-index: 999;
       .title {
         width: 100%;
-        height: 91px;
+        height: 77px;
         text-align: center;
-        line-height: 91px;
+        line-height: 77px;
         color: #fff;
         font-family: PingFang-SC-Medium;
-        font-size: 36px;
+        font-size: 30px;
         border-bottom: 4px solid rgb(48, 63, 95);
       }
       .message_ul {
         width: 100%;
         box-sizing: border-box;
         padding-left: 67px;
-        padding-top: 15px;
+        padding-top: 5px;
         li {
           font-family: PingFang-SC-Medium;
-          font-size: 32px;
+          font-size: 28px;
           color: #fff;
           margin-top: 15px;
           display: flex;
@@ -1317,19 +1506,19 @@ export default {
       }
       .btn_con {
         width: 100%;
-        height: 60px;
+        height: 52px;
         display: flex;
         flex: auto;
         box-sizing: border-box;
-        padding-left: 80px;
-        margin-top: 38px;
+        padding-left: 62px;
+        margin-top: 30px;
         div {
           border-radius: 10px;
-          height: 60px;
+          height: 52px;
           text-align: center;
           font-family: PingFang-SC-Medium;
-          font-size: 32px;
-          line-height: 60px;
+          font-size: 30px;
+          line-height: 52px;
           color: rgb(254, 254, 255);
         }
         .quit {

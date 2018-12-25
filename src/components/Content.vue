@@ -16,7 +16,7 @@
             </div>
         </div>
 
-        <Search v-show="isSearch"></Search>
+        <Search v-show="isSearch" ></Search>
         
          <div class="line" v-show="false"></div>
 
@@ -46,7 +46,9 @@ export default {
       isLogout: false,
       name: "", //当前登录客服
       showSearch: 1,
-      isSearch: true
+      isSearch: true,
+      phone:'',
+
     };
   },
   components: {
@@ -256,6 +258,12 @@ export default {
     if (that.$route.params.showSearch) {
       that.showSearch = that.$route.params.showSearch;
       console.log(that.showSearch, "======================2222");
+    }
+
+     //从订单列表进入详情
+    if (that.$route.params.phone) {
+      that.phone = that.$route.params.phone;
+      console.log(that.phone, "==============手机号码============");
     }
 
     document.addEventListener("click", e => {

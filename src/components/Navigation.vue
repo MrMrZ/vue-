@@ -18,7 +18,13 @@ export default {
     };
   },
   methods: {
-    
+     getPath() {
+      var that = this;
+      console.log(that.$route.path)
+      if ( that.$route.path.indexOf("details") != -1 ) {
+          that.isActive = 1;
+      }
+    },
     toPages(index) {
       var that = this;
       that.isActive = index;
@@ -49,7 +55,9 @@ export default {
       }
     }
   },
-
+  watch: {
+    $route: "getPath"
+  },
   mounted(){
      var that = this;
     

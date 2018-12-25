@@ -2,7 +2,7 @@
    <div class="search_content">
        <div class="search" v-show="true">
             <i class="el-icon-search search_icon" @click="toSearch"></i>
-            <input type="text" placeholder="输入完整手机号" v-model="phoneNum" @input="toSearch"  @keyup.enter="search">
+            <input type="text" placeholder="输入完整手机号" v-model="phoneNum" @input="toSearch"  maxlength="11">
         </div>
          <div class="line" v-show="true"></div>
     </div>
@@ -14,15 +14,22 @@ export default {
   data() {
     return {
       msg: "Welcome to Your Vue.js App",
-      phoneNum: ""
+      phoneNum: "",
+      noInput:false
     };
   },
   components: {},
   methods: {
+   
+    
+    
     toSearch() {
-      if (this.phoneNum.length == 11) {
-        this.search();
-      }
+       var that = this;
+      
+        if (that.phoneNum.length == 11) {
+            that.search();
+        }
+
     },
 
     isPoneAvailable(phoneNum) {
@@ -63,7 +70,8 @@ export default {
         return;
       }
       var data = {
-        phone: that.phoneNum
+        phone: that.phoneNum,
+        type:1
       };
       var token = localStorage.getItem("token");
 
@@ -254,11 +262,12 @@ export default {
     }
   }
   .line {
-    width: 80%;
+    width: 88.5%;
     height: 2px;
     background-color: rgb(72, 92, 133);
-    // margin-left: 121px;
-    margin: 148px auto 0;
+
+    margin-top: 148px;
+    margin-left: 98px;
   }
 }
 </style>
